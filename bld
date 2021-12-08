@@ -8,8 +8,7 @@
 set -e
 
 function usage() {
-    echo 1>&2 "Usage: $0 [-v] [-d] [-x] [-i image] [-s additional] TAG"
-    echo 1>&2 "  -v is verbose."
+    echo 1>&2 "Usage: $0 [-d] [-x] [-i image] [-s additional] TAG"
     echo 1>&2 "  -d enables dry run (no Docker build or push)"
     echo 1>&2 "  -x is 'do not push' (but does build)."
     echo 1>&2 "  -i image specifies target image location."
@@ -31,31 +30,26 @@ OPTIND=1
 DRY_RUN=0
 SUPPLEMENTARY=0
 NOPUSH=0
-VERBOSE=0
 IMAGE="docker.io/lsstsqre/sciplat-lab"
+TARGET="all"
 while getopts ':hvdxi:s:efpt:n:b:' opt; do
     case $opt in
     h)
         usage
         ;;
-    v)
-	VERBOSE=1
-	set -x
-	;;
     d)
-        DRY_RUN=1
+        TARGET="dockerfile"
         ;;
     x)
-        NOPUSH=1
+        TARGET="image"
         ;;
     i)
 	IMAGE=${OPTARG}
 	;;
     s)
-	SUPPLEMENTARY=1
-	addltag=${OPTARG}
+	SUPPLEMENTARY=${OPTARG}
 	;;
-    e | f | p| t | n | b)
+    e | f | p| t | n | b | v)
 	echo "Obsolete option ${opt} no longer has any effect."
 	;;
     \?)
@@ -68,69 +62,10 @@ TAG=${1}
 if [ -z "${TAG}" ] || [ $# -gt 1 ]; then
     usage
 fi
-VERSION=${TAG/#v/r}
-if [ "${SUPPLEMENTARY}" -eq 1 ] && [ -n "${addltag}" ]; then
-    VERSION="exp_${VERSION}_${addltag}"
-fi
-if [ "${NOPUSH}" -eq 1 ]; then
-    VERSION="nopush_${VERSION}"
-fi
-sed -e "s|{{IMAGE}}|${IMAGE}|g" \
-    -e "s|{{VERSION}}|${VERSION}|g" \
-    -e "s|{{TAG}}|${TAG}|g" \
-    < Dockerfile.template > Dockerfile
-if [ "${VERBOSE}" -ne 0 ]; then
-    echo 1>&2 "Dockerfile:"
-    echo 1>&2 " "
-    cat 1>&2 Dockerfile
-    echo 1>&2 " "
-fi
-if [ "${DRY_RUN}" -ne 0 ]; then
-    echo 1>&2 "Dry run: Dockerfile written, stopping before build/push."
-    exit 0
-fi
-platform=""
-if [ "$(uname -p)" == "arm" ]; then
-    platform="--platform=amd64" # There is no ARM build yet, so cross-build
+
+suparg=""
+if [ -n "${SUPPLEMENTARY}" ]; then
+    suparg="supplementary=${SUPPLEMENTARY}"
 fi
 
-# You probably want to set DOCKER_BUILDKIT in your environment if your
-#  Docker supports it.
-docker build ${platform} --progress=plain -t ${IMAGE}:${VERSION} .
-rc=$?
-if [ "${rc}" -ne 0 ]; then
-    echo 1>&2 "Docker build failed."
-    exit 1
-fi
-EXPERIMENTAL=0
-etag=$(echo "${VERSION}" | cut -d '_' -f 1)
-if [ "${etag}" = "nopush" ]; then
-    exit 0
-fi
-if [ "${etag}" = "exp" ]; then
-    EXPERIMENTAL=1
-fi
-docker push ${IMAGE}:${VERSION}
-if [ "${EXPERIMENTAL}" -ne 1 ]; then
-    ichar=$(echo "${VERSION}" | cut -c 1)
-    itype=""
-    case $ichar in
-    "r")
-        itype="release"
-        ;;
-    "w")
-        itype="weekly"
-        ;;
-    "d")
-        itype="daily"
-        ;;
-    *)
-        ;;
-    esac
-if [ -n "$itype" ]; then
-    docker tag ${IMAGE}:${VERSION} ${IMAGE}:latest_${itype}
-    docker push ${IMAGE}:latest_${itype}
-    fi
-    docker tag ${IMAGE}:${VERSION} ${IMAGE}:latest
-    docker push ${IMAGE}:latest
-fi
+make tag=${TAG} image=${IMAGE} ${suparg} ${TARGET}
