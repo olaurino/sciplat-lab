@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+sdir="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+source "${sdir}/parse_options" $*
+platform=""
+if [ "$(uname -p)" == "arm" ]; then
+    platform="--platform=amd64" # There is no ARM build yet, so cross-build
+fi
+
+# You probably want to set DOCKER_BUILDKIT in your environment if your
+#  Docker supports it.
+docker build ${platform} --progress=plain -t ${IMAGE}:${VERSION} .

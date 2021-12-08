@@ -1,4 +1,10 @@
 #!/bin/bash
+
+#
+# This is now obsolete.  You should use the Makefile instead.  Once our
+#  ci jobs are updated, this script will be deleted.
+#
+
 set -e
 
 function usage() {
@@ -6,9 +12,8 @@ function usage() {
     echo 1>&2 "  -v is verbose."
     echo 1>&2 "  -d enables dry run (no Docker build or push)"
     echo 1>&2 "  -x is 'do not push' (but does build)."
-    echo 1>&2 "  -f is flatten (collapse to single layer)."
-    ecgi 1>&2 "  -i <image> specifies target image location."
-    echo 1>&2 "  -s additional adds '_additional' to end of exp. build."
+    echo 1>&2 "  -i image specifies target image location."
+    echo 1>&2 "  -s additional adds '_additional' to end of exp. build tag."
     echo 1>&2 "  default image='docker.io/lsstsqre/sciplat-lab'"
     echo 1>&2 "  typical TAG='w_2021_03'"
     exit 2
@@ -28,7 +33,7 @@ SUPPLEMENTARY=0
 NOPUSH=0
 VERBOSE=0
 IMAGE="docker.io/lsstsqre/sciplat-lab"
-while getopts ':hvdxi:s:' opt; do
+while getopts ':hvdxi:s:efpt:n:b:' opt; do
     case $opt in
     h)
         usage
@@ -49,6 +54,9 @@ while getopts ':hvdxi:s:' opt; do
     s)
 	SUPPLEMENTARY=1
 	addltag=${OPTARG}
+	;;
+    e | f | p| t | n | b)
+	echo "Obsolete option ${opt} no longer has any effect."
 	;;
     \?)
         usage
@@ -88,7 +96,7 @@ fi
 
 # You probably want to set DOCKER_BUILDKIT in your environment if your
 #  Docker supports it.
-docker build ${platform} --progress=plain -t lsstsqre/sciplat-lab:${VERSION} .
+docker build ${platform} --progress=plain -t ${IMAGE}:${VERSION} .
 rc=$?
 if [ "${rc}" -ne 0 ]; then
     echo 1>&2 "Docker build failed."

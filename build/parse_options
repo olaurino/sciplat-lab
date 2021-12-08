@@ -1,0 +1,42 @@
+#!/bin/bash
+set -e
+
+function usage() {
+    echo 1>&2 "Usage: $0 TAG IMAGE [ADDITIONAL]"
+    echo 1>&2 "  if ADDITIONAL is specified,  adds _ADDITIONAL end of exp. build tag."
+    echo 1>&2 "  typical IMAGE='docker.io/lsstsqre/sciplat-lab'"
+    echo 1>&2 "  typical TAG='w_2021_03'"
+    exit 2
+}
+
+function cleanup {
+    if [ -n "${WORKDIR}" ]; then
+        rm -rf ${WORKDIR}
+    fi
+}
+
+trap cleanup EXIT
+WORKDIR=""
+TAG=${1}
+shift
+IMAGE=${1}
+shift
+SUPPLEMENTARY=${1}
+shift || true
+TOOMUCH=${1}
+
+if [ -n "${TOOMUCH}" ] ; then
+    usage
+fi
+if [ -z "${TAG}" ] || [ -z "${IMAGE}" ]; then
+    usage
+fi
+VERSION=${TAG/#v/r}
+if [ -n "${SUPPLEMENTARY}" ]; then
+    VERSION="exp_${VERSION}_${SUPPLEMENTARY}"
+fi
+
+sed -e "s|{{IMAGE}}|${IMAGE}|g" \
+    -e "s|{{VERSION}}|${VERSION}|g" \
+    -e "s|{{TAG}}|${TAG}|g" \
+    < Dockerfile.template > Dockerfile
