@@ -2,55 +2,16 @@
 set -e
 
 function usage() {
-    echo 1>&2 "Usage: $0 [-v] [-d] [-e] [-x] [-f] [-s additional] \\"
-    echo 1>&2 "           [-b BASE_IMAGE] [-n IMAGE_NAME ] [-t TAG_PREFIX ] \\"
-    echo 1>&2 "           TAG"
+    echo 1>&2 "Usage: $0 [-v] [-d] [-x] [-i image] [-s additional] TAG"
     echo 1>&2 "  -v is verbose."
     echo 1>&2 "  -d enables dry run (no Docker build or push)"
-    echo 1>&2 "  -e is experimental (exp_ before tag), no 'latest' tag."
     echo 1>&2 "  -x is 'do not push' (but does build)."
     echo 1>&2 "  -f is flatten (collapse to single layer)."
+    ecgi 1>&2 "  -i <image> specifies target image location."
     echo 1>&2 "  -s additional adds '_additional' to end of exp. build."
-    echo 1>&2 "  default BASE_IMAGE='lsstsqre/centos'"
-    echo 1>&2 "  default IMAGE_NAME='lsstsqre/sciplat-lab'"
-    echo 1>&2 "  default TAG_PREFIX='7-stack-lsst_distrib-'"
+    echo 1>&2 "  default image='docker.io/lsstsqre/sciplat-lab'"
     echo 1>&2 "  typical TAG='w_2021_03'"
     exit 2
-}
-
-function flatten {
-    TAG=$1
-    owd=$(pwd)
-    WORKDIR=$(mktemp -d)
-    if [ "${VERBOSE}" -ne 0 ]; then
-	echo 1>&2 "Flatten working dir: ${WORKDIR}"
-    fi
-    cp Dockerfile ${WORKDIR}/Df.in
-    cd ${WORKDIR}
-    dtag=$(echo ${TAG} | rev | cut -d ':' -f 1 | rev)
-    ttag="${TAG}_temp"
-    ctag="${dtag}_ctr"
-    ltag="${TAG}_layered"
-    echo "FROM ${ttag}" > Dockerfile
-    grep '^USER\|^ENV\|^WORKDIR\|^CMD\|^ENTRYPOINT\|^ONBUILD\|^EXPOSE\|^VOLUME' Df.in >> Dockerfile
-    if [ "${VERBOSE}" -ne 0 ]; then
-	echo 1>&2 "Dockerfile for flattened image:"
-	echo 1>&2 " "
-	cat 1>&2 Dockerfile
-	echo 1>&2 " "
-    fi
-    docker rm ${ctag} || true
-    docker tag ${TAG} ${ltag}
-    docker run --name ${ctag} ${TAG} /bin/true
-    docker export ${ctag} | docker import - ${ttag}
-    docker rm ${ctag}
-    flat_tag="${TAG}_flattened"
-    docker build -t ${flat_tag} .
-    docker tag ${flat_tag} ${TAG}
-    docker rmi ${ttag} ${ltag}
-    docker image prune -f || true
-    docker builder prune -f || true
-    cd ${owd}
 }
 
 function cleanup {
@@ -63,15 +24,11 @@ trap cleanup EXIT
 WORKDIR=""
 OPTIND=1
 DRY_RUN=0
-EXPERIMENTAL=0
-SPECIAL=0
+SUPPLEMENTARY=0
 NOPUSH=0
-FLATTEN=0
 VERBOSE=0
-BASE_IMAGE="lsstsqre/centos"
-IMAGE_NAME="lsstsqre/sciplat-lab"
-TAG_PREFIX="7-stack-lsst_distrib-"
-while getopts ':hvdexfs:p:n:b:t:' opt; do
+IMAGE="docker.io/lsstsqre/sciplat-lab"
+while getopts ':hvdxi:s:' opt; do
     case $opt in
     h)
         usage
@@ -83,33 +40,16 @@ while getopts ':hvdexfs:p:n:b:t:' opt; do
     d)
         DRY_RUN=1
         ;;
-    e)
-        EXPERIMENTAL=1
-        ;;
     x)
         NOPUSH=1
         ;;
-    f)
-	FLATTEN=1
+    i)
+	IMAGE=${OPTARG}
 	;;
     s)
-	SPECIAL=1
-	EXPERIMENTAL=1
+	SUPPLEMENTARY=1
 	addltag=${OPTARG}
 	;;
-    p)
-        _junk=${OPTARG}
-        echo 1>&2 "-p PYVER is no longer supported.  Ignoring."
-        ;;
-    b)
-        BASE_IMAGE=${OPTARG}
-        ;;
-    n)
-        IMAGE_NAME=${OPTARG}
-        ;;
-    t)
-        TAG_PREFIX=${OPTARG}
-        ;;
     \?)
         usage
         ;;
@@ -121,24 +61,13 @@ if [ -z "${TAG}" ] || [ $# -gt 1 ]; then
     usage
 fi
 VERSION=${TAG/#v/r}
-if [ "${EXPERIMENTAL}" -eq 1 ]; then
-    VERSION="exp_${VERSION}"
-fi
-if [ "${SPECIAL}" -eq 1 ] && [ -n "${addltag}" ]; then
-    VERSION="${VERSION}_${addltag}"
+if [ "${SUPPLEMENTARY}" -eq 1 ] && [ -n "${addltag}" ]; then
+    VERSION="exp_${VERSION}_${addltag}"
 fi
 if [ "${NOPUSH}" -eq 1 ]; then
     VERSION="nopush_${VERSION}"
 fi
-if [ "${FLATTEN}" -eq 1 ]; then
-    # We are going to cheat, build a nopush version, then reverse the tagging
-    #  and push the flattened one.
-    orig_ver=${VERSION}
-    VERSION="nopush_${VERSION}"
-fi
-sed -e "s|{{BASE_IMAGE}}|${BASE_IMAGE}|g" \
-    -e "s|{{IMAGE_NAME}}|${IMAGE_NAME}|g" \
-    -e "s|{{TAG_PREFIX}}|${TAG_PREFIX}|g" \
+sed -e "s|{{IMAGE}}|${IMAGE}|g" \
     -e "s|{{VERSION}}|${VERSION}|g" \
     -e "s|{{TAG}}|${TAG}|g" \
     < Dockerfile.template > Dockerfile
@@ -152,44 +81,48 @@ if [ "${DRY_RUN}" -ne 0 ]; then
     echo 1>&2 "Dry run: Dockerfile written, stopping before build/push."
     exit 0
 fi
-./bld_1
-if [ "${FLATTEN}" -eq 1 ]; then
-    np_ver="${IMAGE_NAME}:${VERSION}"
-    VERSION=${orig_ver}
-    img_str="${IMAGE_NAME}:${VERSION}"
-    docker tag ${np_ver} ${img_str}
-    docker rmi ${np_ver}
-    flatten ${img_str}
-    if [ "${NOPUSH}" -eq 0 ]; then
-	# This is all duplicated from ./bld_1 ; yuck, but here we are
-	EXPERIMENTAL=0
-	etag=$(echo "${VERSION}" | cut -d '_' -f 1)
-	if [ "${etag}" = "exp" ]; then
-	    EXPERIMENTAL=1
-	fi
-	docker push ${img_str}
-	if [ "${EXPERIMENTAL}" -ne 1 ]; then
-	    ichar=$(echo "${VERSION}" | cut -c 1)
-	    itype=""
-	    case $ichar in
-		"r")
-		    itype="release"
-		    ;;
-		"w")
-		    itype="weekly"
-		    ;;
-		"d")
-		    itype="daily"
-		    ;;
-		*)
-		    ;;
-	    esac
-	    if [ -n "$itype" ]; then
-		docker tag ${img_str} ${IMAGE_NAME}:latest_${itype}
-		docker push ${IMAGE_NAME}:latest_${itype}
-	    fi
-	    docker tag ${img_str} ${IMAGE_NAME}:latest
-	    docker push ${IMAGE_NAME}:latest
-	fi
+platform=""
+if [ "$(uname -p)" == "arm" ]; then
+    platform="--platform=amd64" # There is no ARM build yet, so cross-build
+fi
+
+# You probably want to set DOCKER_BUILDKIT in your environment if your
+#  Docker supports it.
+docker build ${platform} --progress=plain -t lsstsqre/sciplat-lab:${VERSION} .
+rc=$?
+if [ "${rc}" -ne 0 ]; then
+    echo 1>&2 "Docker build failed."
+    exit 1
+fi
+EXPERIMENTAL=0
+etag=$(echo "${VERSION}" | cut -d '_' -f 1)
+if [ "${etag}" = "nopush" ]; then
+    exit 0
+fi
+if [ "${etag}" = "exp" ]; then
+    EXPERIMENTAL=1
+fi
+docker push ${IMAGE}:${VERSION}
+if [ "${EXPERIMENTAL}" -ne 1 ]; then
+    ichar=$(echo "${VERSION}" | cut -c 1)
+    itype=""
+    case $ichar in
+    "r")
+        itype="release"
+        ;;
+    "w")
+        itype="weekly"
+        ;;
+    "d")
+        itype="daily"
+        ;;
+    *)
+        ;;
+    esac
+if [ -n "$itype" ]; then
+    docker tag ${IMAGE}:${VERSION} ${IMAGE}:latest_${itype}
+    docker push ${IMAGE}:latest_${itype}
     fi
+    docker tag ${IMAGE}:${VERSION} ${IMAGE}:latest
+    docker push ${IMAGE}:latest
 fi

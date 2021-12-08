@@ -1,4 +1,4 @@
-FROM {{BASE_IMAGE}}:{{TAG_PREFIX}}{{TAG}}
+FROM lsstsqre/centos:7-stack-lsst_distrib-{{TAG}}
 USER root
 SHELL ["/bin/bash", "-lc"]
 # If we don't have locales set correctly, the pip install pieces can fail.
@@ -72,6 +72,6 @@ WORKDIR /tmp
 #  context, and they manage to get all the setup env right, still not root.
 USER 1000:1000
 CMD [ "/opt/lsst/software/jupyterlab/runlab.sh" ]
-LABEL description="Rubin Science Platform Notebook Aspect: {{IMAGE_NAME}}" \
-       name="{{IMAGE_NAME}}" \
+LABEL description="Rubin Science Platform Notebook Aspect: {{IMAGE}}" \
+       name="{{IMAGE}}" \
        version="{{VERSION}}"
