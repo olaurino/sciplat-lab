@@ -31,17 +31,19 @@ cd dircolors-solarized
 cp dircolors* /etc
 
 # Install LaTeX from TexLive; in order to make jupyterlab exports
-#  work, we lean heavily on this.  It may be possible to use a
-#  Conda-packaged TeX but it kinda looks like there be dragons.
+#  work, we lean heavily on this.  It might be possible to use a
+#  Conda-packaged TeX but there be dragons.
 #
-cd /tmp/tex
+mkdir -p ${BLD}/tex
+cd ${BLD}/tex
+mv ${BLD}/texlive.profile .
 FN="install-tl-unx.tar.gz"
 curl -L http://mirror.ctan.org/systems/texlive/tlnet/${FN} -o ${FN}
 tar xvpfz ${FN}
 ./install-tl-*/install-tl --repository \
     http://ctan.math.illinois.edu/systems/texlive/tlnet \
-    --profile /tmp/tex/texlive.profile
-rm -rf /tmp/tex/${FN} /tmp/tex/install-tl*
+    --profile ${BLD}/tex/texlive.profile
+rm -rf ${BLD}/tex/${FN} ${BLD}/tex/install-tl*
 # More TeX stuff we need for PDF export
 PATH=/usr/local/texlive/2021/bin/x86_64-linux:${PATH}
 tlmgr install caption lm adjustbox xkeyval collectbox xcolor \
@@ -55,4 +57,4 @@ ln -s /usr/local/texlive/2021/bin/x86_64-linux/xelatex \
       /usr/bin
 
 # Clear our caches
-rm -rf /tmp/* /tmp/.[0-z]* 
+rm -rf /tmp/* /tmp/.[0-z]* ${BLD}/tex

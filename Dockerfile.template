@@ -17,14 +17,17 @@ RUN  mkdir -p /opt/lsst/software/rspstack
 #  increases container size by about 60%.  If you want it in the same
 #  environment (the default), link the RSP loadstack instead.
 #COPY loadrspstack.bash ${LOADRSPSTACK}
+# In general: if an environment variable needs to be used across multiple
+#  stages, make it an ARG.  Introduce it before the first stage that uses it.
 RUN  ln -s ${LOADSTACK} ${LOADRSPSTACK}
 ARG  srcdir=/opt/lsst/src
 ARG  BLD=${srcdir}/build
-RUN  mkdir -p ${BLD}
+ARG  jl=/opt/lsst/software/jupyterlab
+ARG  verdir="${jl}/versions.installed"
+RUN  mkdir -p ${BLD} ${verdir}
 COPY stage1-rpm.sh ${BLD}
 RUN  ${BLD}/stage1-rpm.sh
-RUN  mkdir -p /tmp/tex
-COPY texlive.profile /tmp/tex
+COPY texlive.profile ${BLD}
 COPY stage2-os.sh ${BLD}
 RUN  ${BLD}/stage2-os.sh
 COPY stage3-py.sh ${BLD}
@@ -32,17 +35,8 @@ RUN  ${BLD}/stage3-py.sh
 # This should be exposed at runtime for JupyterLab, hence ENV
 ENV  NODE_OPTIONS="--max-old-space-size=7168 --max-http-header-size=16384"
 RUN  mkdir -p /usr/local/etc/jupyter
+# We update the config during stage 4.
 COPY jupyter_notebook_config.json /usr/local/etc/jupyter
-# Server, notebook, and lab extensions
-ARG SVXT="jupyter_firefly_extensions \
-          jupyterlab_iframe"
-ARG NBXT="widgetsnbextension"
-ARG LBXT="ipyvolume \
-          jupyterlab_iframe \
-          ipyevents \
-          jupyter_firefly_extensions"
-ARG  jl=/opt/lsst/software/jupyterlab
-ARG  verdir="${jl}/versions.installed"
 COPY stage4-jup.sh ${BLD}
 RUN  ${BLD}/stage4-jup.sh
 COPY local01-nbstripjq.sh local02-hub.sh local03-showrspnotice.sh  \
