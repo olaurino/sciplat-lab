@@ -1,9 +1,0 @@
-#!/bin/bash
-set -e
-
-sdir="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-source "${sdir}/parse_options" $*
-sed -e "s|{{IMAGE}}|${IMAGE}|g" \
-    -e "s|{{VERSION}}|${VERSION}|g" \
-    -e "s|{{TAG}}|${TAG}|g" \
-    < Dockerfile.template > Dockerfile
