@@ -12,7 +12,7 @@ set -e
 source ${LOADRSPSTACK}
 conda install -y mamba # not strictly necessary, but better error reporting
 mamba install --no-banner -y \
-      'jupyterlab>=3,<4' \
+      "jupyterlab>=3,<4" \
       ipykernel \
       jupyterhub \
       jupyter-server-proxy \
@@ -61,7 +61,7 @@ mamba install --no-banner -y \
       python-socketio \
       freetype-py \
       terminado \
-      nodejs \
+      "nodejs>=16" \
       yarn \
       jedi \
       xarray \
@@ -82,7 +82,7 @@ pip install --upgrade \
        jupyter_firefly_extensions \
        lsst-rsp \
        rsp-jupyter-extensions
-# wfdispatcher needs rework for JL3/nublado2
+# wfdispatcher needs rework for JL3/nublado2, or abandoning
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
@@ -94,3 +94,9 @@ rm -rf ${stacktop}/envs/${LSST_CONDA_ENV_NAME}/share/jupyter/kernels/python3
 # Clear Conda and pip caches
 mamba clean -a -y
 rm -rf /root/.cache/pip
+
+# Create package version docs.
+#  conda env export works where mamba env export does not
+pip3 freeze > ${verdir}/requirements-stack.txt
+mamba list --explicit > ${verdir}/conda-stack.txt
+conda env export > ${verdir}/conda-stack.yml

@@ -18,3 +18,6 @@ yum -y install \
     nano vim-enhanced emacs-nox ed
 # Clear build cache
 yum clean all
+
+# export RPM list; verdir is an ARG and has already been created.
+rpm -qa | sort > ${verdir}/rpmlist.txt
