@@ -43,13 +43,8 @@ image := $(image)
 #   version is added, the tag will be marked as "exp_" with the supplement
 #   added at the end after an underscore.
 version := $(tag)
+version := $(version:v%=r%)
 
-ttype = $(shell echo $(tag) | cut -c 1)
-ifeq ($(ttype),v)
-    # Replace "v" with "r" at start of tag.
-    trest = $(shell echo $(tag) | cut -c 2-)
-    version := r$(trest)
-endif
 ifneq ($(supplementary),)
     version := exp_$(version)_$(supplementary)
 endif
@@ -58,7 +53,7 @@ endif
 #  building on such a machine (e.g. Apple Silicon), cross-build to amd64
 #  instead
 
-uname != $(shell uname -p)
+uname := $(shell uname -p)
 ifeq ($(uname),arm)
     platform := --platform amd64
 endif
@@ -75,7 +70,7 @@ ifeq ($(tag_type),w)
 else ifeq ($(tag_type),r)
     # if it's got an "rc" in the name, it's a release candidate, and we don't
     #  want to tag it as latest anything either.
-    ifeq (,$(findstring rc $(version)))
+    ifeq ($(findstring rc $(version)),)
        ltype := latest_release
        latest := latest
     endif
@@ -88,7 +83,7 @@ endif
 
 # "all" and "build" are just aliases for "push" and "image" respectively.
 
-.PHONY: clean dockerfile image build push all
+.PHONY: all push build image dockerfile clean
 
 all: push
 
@@ -96,10 +91,10 @@ all: push
 #  to push to whatever the target repository (specified in $(image)) may be.
 push: image
 	$(DOCKER) push $(image):$(version)
-ifneq (,$(ltype))
+ifneq ($(ltype),)
 	$(DOCKER) push $(image):$(ltype)
 endif
-ifneq (,$(latest))
+ifneq ($(latest),)
 	$(DOCKER) push $(image):$(latest)
 endif
 

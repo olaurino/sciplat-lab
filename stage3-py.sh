@@ -98,5 +98,5 @@ rm -rf /root/.cache/pip
 # Create package version docs.
 #  conda env export works where mamba env export does not
 pip3 freeze > ${verdir}/requirements-stack.txt
-mamba list --export > ${verdir}/conda-stack.txt
+mamba list --explicit > ${verdir}/conda-stack.txt
 conda env export > ${verdir}/conda-stack.yml
