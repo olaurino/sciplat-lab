@@ -86,7 +86,9 @@ endif
 # There are no targets in the classic sense, and there is a strict linear
 #  dependency from building the dockerfile to the image to pushing it.
 
-.PHONY: clean dockerfile image push all
+# "all" and "build" are just aliases for "push" and "image" respectively.
+
+.PHONY: clean dockerfile image build push all
 
 all: push
 
@@ -100,6 +102,9 @@ endif
 ifneq (,$(latest))
 	$(DOCKER) push $(image):$(latest)
 endif
+
+# I keep getting this wrong, so make it work either way.
+build: image
 
 image: dockerfile
 	$(DOCKER) build ${platform} --progress=plain -t $(image):$(version) .
