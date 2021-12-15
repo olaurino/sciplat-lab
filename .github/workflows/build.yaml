@@ -58,7 +58,7 @@ jobs:
     - name: Log in to Docker Hub
       # Only bother if we're going to push the container.
       if: >-
-        equals(env.target, 'push')
+        (env.target == 'push')
       uses: docker/login-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
