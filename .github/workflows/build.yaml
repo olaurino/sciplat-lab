@@ -1,22 +1,39 @@
-name: build
-on: workflow_dispatch
+name: Manually triggered build of sciplat-lab container
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'EUPS tag of input DM Pipelines Stack container'
+        required: true
+        default: ''
+      supplementary:
+        description: 'Supplementary tag for experimental builds; yields output tag exp_tag_supplementary'
+        required: false
+        default: ''
+      image:
+        description: 'URI for output Docker image'
+        required: false
+        default: 'docker.io/lsstsqre/sciplat-lab'
+        # someday: 'ghcr.io/lsst-sqre/sciplat-lab'
+      push:
+        description: 'push resulting image; make empty or set to a YAML-false string to build but not push'
+        required: false
+        default: 'true'
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
     - name: checkout
       uses: actions/checkout@v2
-
-    - name: get_inputs
-      uses: ./.github/actions/get-inputs-action
-
     - name: import_inputs
       shell: bash
       run: |
-        echo "tag=${{ inputs.tag }}" >> $GITHUB_ENV
-        echo "supplementary=${{ inputs.supplementary }}" >> $GITHUB_ENV
-        echo "image=${{ inputs.image }}" >> $GITHUB_ENV
-        echo "push=${{ inputs.push }}">> $GITHUB_ENV
+        echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+        echo "supplementary=${{ github.event.inputs.supplementary }}" >> $GITHUB_ENV
+        echo "image=${{ github.event.inputs.image }}" >> $GITHUB_ENV
+        echo "push=${{ github.event.inputs.push }}">> $GITHUB_ENV
 
     - name: parse_env
       shell: bash
