@@ -1,0 +1,62 @@
+name: Manually triggered build of sciplat-lab container
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'EUPS tag of input DM Pipelines Stack container'
+        required: true
+        default: ''
+      supplementary:
+        description: 'Supplementary tag for experimental builds; yields output tag exp_tag_supplementary'
+        required: false
+        default: ''
+      image:
+        description: 'URI for output Docker image'
+        required: false
+        default: 'docker.io/lsstsqre/sciplat-lab'
+        # someday: 'ghcr.io/lsst-sqre/sciplat-lab'
+      push:
+        description: 'push resulting image; make empty or set to a YAML-false string to build but not push'
+        required: false
+        default: 'true'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: import_inputs
+      shell: bash
+      run: |
+        echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
+        echo "supplementary=${{ github.event.inputs.supplementary }}" >> $GITHUB_ENV
+        echo "image=${{ github.event.inputs.image }}" >> $GITHUB_ENV
+        echo "push=${{ github.event.inputs.push }}">> $GITHUB_ENV
+
+    - name: parse_env
+      shell: bash
+      run: |
+         case ${{ env.push }} in
+             ''|n|N|no|No|NO|false|False|FALSE|off|Off|OFF)
+                 echo "target=image" >> $GITHUB_ENV
+                 ;;
+             *)
+                 echo "target=push" >> $GITHUB_ENV
+                 ;;
+         esac
+         make_args="tag=${{ env.tag }}"
+         if [ -n "${{ env.supplementary }}" ]; then
+             make_args="${make_args} supplementary=${{ env.supplementary }}"
+         fi
+         if [ -n "${{ env.image }}" ]; then
+             make_args="${make_args} image=${{ env.image }}"
+         fi
+         echo "make_args=${make_args}" >> $GITHUB_ENV
+               
+    - name: build
+      shell: bash
+      run: |
+            make ${{ env.make_args }} ${{ env.target }}
+
