@@ -1,0 +1,45 @@
+name: build
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+
+    - name: get_inputs
+      uses: ./.github/actions/get-inputs-action
+
+    - name: import_inputs
+      shell: bash
+      run: |
+        echo "tag=${{ inputs.tag }}" >> $GITHUB_ENV
+        echo "supplementary=${{ inputs.supplementary }}" >> $GITHUB_ENV
+        echo "image=${{ inputs.image }}" >> $GITHUB_ENV
+        echo "push=${{ inputs.push }}">> $GITHUB_ENV
+
+    - name: parse_env
+      shell: bash
+      run: |
+         case ${{ env.push }} in
+             ''|n|N|no|No|NO|false|False|FALSE|off|Off|OFF)
+                 echo "target=image" >> $GITHUB_ENV
+                 ;;
+             *)
+                 echo "target=push" >> $GITHUB_ENV
+                 ;;
+         esac
+         make_args="tag=${{ env.tag }}"
+         if [ -n "${{ env.supplementary }}" ]; then
+             make_args="${make_args} supplementary=${{ env.supplementary }}"
+         fi
+         if [ -n "${{ env.image }}" ]; then
+             make_args="${make_args} image=${{ env.image }}"
+         fi
+         echo "make_args=${make_args}" >> $GITHUB_ENV
+               
+    - name: build
+      shell: bash
+      run: |
+            make ${{ env.make_args }} ${{ env.target }}
+
