@@ -65,22 +65,22 @@ jobs:
          c_image_host=$(echo ${{ env.image }} | cut -d '/' -f 1 | rev | cut -d '.' -f 1-2 | rev)
          case ${c_image_host} in
              docker.com | docker.io)
-                 d_repository="docker.io"
+                 d_registry="docker.io"
                  d_username=${{ secrets.DOCKER_USERNAME }}
                  d_password=${{ secrets.DOCKER_TOKEN }}
                  ;;
              ghcr.io)
-                 d_repository="ghcr.io"
+                 d_registry="ghcr.io"
                  d_username=${{ github.actor }}
                  d_password=${{ secrets.GITHUB_TOKEN}}
                  ;;
              *)
-                 d_repository=${c_image_host}
+                 d_registry=${c_image_host}
                  d_username=''
                  d_password=''
                  ;;
          esac
-         echo "d_repository=${d_repository}" >> $GITHUB_ENV
+         echo "d_registry=${d_registry}" >> $GITHUB_ENV
          echo "d_username=${d_username}" >> $GITHUB_ENV
          echo "d_password=${d_password}" >> $GITHUB_ENV
 
@@ -89,12 +89,12 @@ jobs:
       #  credentials
       if: >-
         ((env.target == 'push') &&
-         (env.d_repository != '') &&
+         (env.d_registry != '') &&
          (env.d_username != '') &&
          (env.d_password != ''))
       uses: docker/login-action@v1
       with:
-        repository: ${{ env.d_repository }}
+        registry: ${{ env.d_registry }}
         username: ${{ env.d_username }}
         password: ${{ env.d_password }}
 
