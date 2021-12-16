@@ -12,7 +12,7 @@ on:
         required: false
         default: ''
       image:
-        description: 'URI for output Docker image'
+        description: 'fully-qualified URI for output Docker image'
         required: false
         default: 'docker.io/lsstsqre/sciplat-lab'
         # someday: 'ghcr.io/lsst-sqre/sciplat-lab'
@@ -54,11 +54,15 @@ jobs:
              make_args="${make_args} image=${{ env.image }}"
          fi
          echo "make_args=${make_args}" >> $GITHUB_ENV
+         image_host=$(echo ${{ env.image }} | cut -d '/' -f 1)
+         echo "image_host=$image_host" >> $GITHUB_ENV
 
     - name: Log in to Docker Hub
-      # Only bother if we're going to push the container.
+      # Only bother if we're going to push the container to Docker Hub
       if: >-
-        (env.target == 'push')
+        ((env.target == 'push') &&
+         ((endsWith(env.image_host, 'docker.io' )) ||
+          (endsWith(env.image_host, 'docker.com'))))
       uses: docker/login-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
