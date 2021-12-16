@@ -98,12 +98,6 @@ jobs:
         username: ${{ env.d_username }}
         password: ${{ env.d_password }}
 
-    - name: Remove credentials from environment
-      shell: bash
-      run: |
-         grep -v d_password $GITHUB_ENV > ${GITHUB_ENV}.bak
-         mv ${GITHUB_ENV}.bak ${GITHUB_ENV}
-
     - name: build
       shell: bash
       run: |
