@@ -23,11 +23,11 @@ on:
 
 # We need actions/write if we want to do a GH App, and we need
 # packages/write to push to ghcr.io
-permissions:
-  actions: write
-  contents: read
-  packages: write
-  statuses: read
+permissions: read-all | write-all
+#  actions: write
+#  contents: read
+#  packages: write
+#  statuses: read
 
 jobs:
   build:
