@@ -25,17 +25,8 @@ on:
 # packages/write to push to ghcr.io
 permissions:
   actions: write
-  checks: read
   contents: read
-  deployments: read
-  id-token: read
-  issues: read
-  discussion: read
   packages: write
-  pages: read
-  pull-requests: read
-  repository-projects: read
-  security-events: read
   statuses: read
 
 jobs:
