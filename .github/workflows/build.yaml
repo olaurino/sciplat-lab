@@ -22,12 +22,13 @@ on:
         default: 'true'
 
 # We need actions/write if we want to do a GH App, and we need
-# packages/write to push to ghcr.io
-permissions: write-all
-#  actions: write
-#  contents: read
-#  packages: write
-#  statuses: read
+# packages/write to push to ghcr.io with GITHUB_TOKEN (currently not
+# working, under investigation)
+permissions:
+  actions: write
+  contents: read
+  packages: write
+  statuses: read
 
 jobs:
   build:
@@ -71,8 +72,8 @@ jobs:
                  ;;
              ghcr.io)
                  d_registry="ghcr.io"
-                 d_username=${{ github.actor }}
-                 d_password=${{ secrets.GITHUB_TOKEN}}
+                 d_username="token"
+                 d_password=${{ secrets.GHCR_PUSH_TOKEN}}
                  ;;
              *)
                  d_registry=${c_image_host}
