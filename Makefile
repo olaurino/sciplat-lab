@@ -101,9 +101,11 @@ all: push
 push: image
 	$(DOCKER) push $(image):$(version)
 ifneq ($(ltype),)
+	$(DOCKER) tag $(image):$(version) $(image):$(ltype)
 	$(DOCKER) push $(image):$(ltype)
 endif
 ifneq ($(latest),)
+	$(DOCKER) tag $(image):$(version) $(image):$(latest)
 	$(DOCKER) push $(image):$(latest)
 endif
 
