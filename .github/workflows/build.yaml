@@ -33,6 +33,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 100
     steps:
     - name: checkout
       uses: actions/checkout@v2
