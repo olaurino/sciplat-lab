@@ -70,7 +70,8 @@ mamba install --no-banner -y \
       pythreejs \
       bqplot \
       jupyterlab_execute_time \
-      ipympl
+      ipympl \
+      ciso8601
 # These are the things that are not in conda.
 pip install --upgrade \
        nbconvert[webpdf] \
