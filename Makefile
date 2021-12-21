@@ -79,7 +79,7 @@ ifeq ($(tag_type),w)
 else ifeq ($(tag_type),r)
     # if it's got an "rc" in the name, it's a release candidate, and we don't
     #  want to tag it as latest anything either.
-    ifeq ($(findstring rc $(version)),)
+    ifeq ($(findstring rc, $(version)),)
        ltype := latest_release
        latest := latest
     endif
