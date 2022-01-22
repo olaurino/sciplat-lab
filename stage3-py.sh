@@ -7,14 +7,12 @@ set -e
 #
 # source ${LOADSTACK}
 # rspname="rsp-${LSST_CONDA_ENV_NAME}"
-# conda create --name ${rspname} --clone ${LSST_CONDA_ENV_NAME}
+# mamba create --name ${rspname} --clone ${LSST_CONDA_ENV_NAME}
 #
 source ${LOADRSPSTACK}
-conda install -y mamba # not strictly necessary, but better error reporting
 mamba install --no-banner -y \
       "jupyterlab>=3,<4" \
       ipykernel \
-      jupyterhub \
       jupyter-server-proxy \
       jupyter-packaging \
       geoviews \
@@ -72,7 +70,7 @@ mamba install --no-banner -y \
       jupyterlab_execute_time \
       ipympl \
       ciso8601
-# These are the things that are not in conda.
+# These are the things that are not available on conda-forge.
 pip install --upgrade \
        nbconvert[webpdf] \
        wfdispatcher \
@@ -83,7 +81,6 @@ pip install --upgrade \
        jupyter_firefly_extensions \
        lsst-rsp \
        rsp-jupyter-extensions
-# wfdispatcher needs rework for JL3/nublado2, or abandoning
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
@@ -92,12 +89,10 @@ python3 -m ipykernel install --name 'LSST'
 stacktop="/opt/lsst/software/stack/conda/current"
 rm -rf ${stacktop}/envs/${LSST_CONDA_ENV_NAME}/share/jupyter/kernels/python3
 
-# Clear Conda and pip caches
+# Clear Mamba and pip caches
 mamba clean -a -y
 rm -rf /root/.cache/pip
 
 # Create package version docs.
-#  conda env export works where mamba env export does not
 pip3 freeze > ${verdir}/requirements-stack.txt
-mamba list --explicit > ${verdir}/conda-stack.txt
-conda env export > ${verdir}/conda-stack.yml
+mamba env export > ${verdir}/conda-stack.yml
