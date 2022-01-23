@@ -10,6 +10,9 @@ set -e
 # mamba create --name ${rspname} --clone ${LSST_CONDA_ENV_NAME}
 #
 source ${LOADRSPSTACK}
+if [ -z "$(which mamba)" ]; then
+    conda install -y mamba
+fi
 mamba install --no-banner -y \
       "jupyterlab>=3,<4" \
       ipykernel \
