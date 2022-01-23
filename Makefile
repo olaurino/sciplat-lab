@@ -11,6 +11,11 @@
 # To push to a different repository:
 #   make tag=w_2021_50 image=ghcr.io/lsst-sqre/sciplat-lab
 
+# To use a different input image:
+#   make tag=w_2021_49_c0023.008 \
+#    input=ts-dockerhub.lsst.org/lsstts/sal-sciplat: \
+#    image=ts-dockerhub.lsst.org/lsstts/sal-sciplat-lab
+
 # To tag as experimental "foo" (-> exp_w_2021_50_foo):
 #   make tag=w_2021_50 supplementary=foo
 
@@ -29,6 +34,12 @@ endif
 ifeq ($(image),)
     image = docker.io/lsstsqre/sciplat-lab
     # Some day this might be a ghcr.io default
+endif
+
+ifeq ($(input),)
+    input = docker.io/lsstsqre/centos:7-stack-lsst_distrib-
+    # You need to include the colon here, and the input tag has to
+    # end with $(tag)
 endif
 
 # Some day we might use a different build tool.  If you have a new enough
@@ -118,6 +129,7 @@ image: dockerfile
 dockerfile: clean
 	sed -e "s|{{IMAGE}}|$(image)|g" \
 	    -e "s|{{VERSION}}|$(version)|g" \
+	    -e "s|{{INPUT}}|$(input)|g" \
 	    -e "s|{{TAG}}|$(tag)|g" \
 	    < Dockerfile.template > Dockerfile
 
