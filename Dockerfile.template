@@ -1,4 +1,4 @@
-FROM lsstsqre/centos:7-stack-lsst_distrib-{{TAG}}
+FROM {{INPUT}}{{TAG}}
 USER root
 SHELL ["/bin/bash", "-lc"]
 # If we don't have locales set correctly, the pip install pieces can fail.
