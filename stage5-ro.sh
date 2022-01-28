@@ -23,6 +23,7 @@ echo "OK" > ${jl}/no_sudo_ok
 rm -f /etc/passwd- /etc/shadow- /etc/group- /etc/gshadow-
 
 # Check out notebooks-at-build-time
+# Do a shallow clone (important for the tutorials)
 branch="prod"
 notebooks="lsst-sqre/system-test rubin-dp0/tutorial-notebooks"
 nbdir="/opt/lsst/software/notebooks-at-build-time"
@@ -31,6 +32,6 @@ source ${LOADRSPSTACK}
 mkdir -p ${nbdir}
 cd ${nbdir}
 for n in ${notebooks}; do
-    git clone -b ${branch} "https://github.com/${n}"
+    git clone --depth 1 -b ${branch} "https://github.com/${n}"
 done
 cd ${owd}
