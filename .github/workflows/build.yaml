@@ -82,24 +82,24 @@ jobs:
                  docker.com | docker.io | *.docker.com | *.docker.io)
                      d_tag="docker_"
                      d_registry="docker.io"
-                     d_username=${{ secrets.DOCKER_USERNAME }}
-                     d_password=${{ secrets.DOCKER_TOKEN }}
+                     d_username="${{ secrets.DOCKER_USERNAME }}"
+                     d_password="${{ secrets.DOCKER_TOKEN }}"
                      ;;
                  ghcr.io | *.ghcr.io)
                      d_tag="github_"
                      d_registry="ghcr.io"
                      d_username="token"
-                     d_password=${{ secrets.GHCR_PUSH_TOKEN}}
+                     d_password="${{ secrets.GHCR_PUSH_TOKEN}}"
                      ;;
                  *-docker.pkg.dev)
                      d_tag="google_"
-                     d_registry=${image_host}
+                     d_registry="${image_host}"
                      d_username="_json_key_base64"
-                     d_password=${{ secrets.GAR_PUSH_TOKEN }}
+                     d_password="${{ secrets.GAR_PUSH_TOKEN }}"
                      ;;
                  *)
                      d_tag=""
-                     d_registry=${image_host}
+                     d_registry="${image_host}"
                      d_username=""
                      d_password=""
                      ;;
