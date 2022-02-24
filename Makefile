@@ -1,7 +1,8 @@
 # We need three pieces of information to build the container:
 #  tag is the tag on the input DM Stack container.  It is mandatory.
 #  image is the Docker repository image we're pushing to; we can use the
-#   default if we don't specify it, which goes to Docker Hub
+#   default if we don't specify it, which goes to Docker Hub.  image
+#   may be a comma-separated list of target repositories.
 #  supplementary is an additional tag, which forces the build to an "exp_"
 #   (that is, experimental) tag and adds "_" plus the supplement at the end.
 
@@ -108,7 +109,8 @@ endif
 all: push
 
 # push assumes that the building user already has docker credentials
-#  to push to whatever the target repository (specified in $(image)) may be.
+#  to push to whatever the target repository or repositories (specified in
+#  $(image), possibly as a comma-separated list of targets) may be.
 push: image
 	img=$$(echo $(image) | cut -d ',' -f 1) && \
 	more=$$(echo $(image) | cut -d ',' -f 2-) && \

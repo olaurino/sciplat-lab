@@ -64,7 +64,10 @@ jobs:
              make_args="${make_args} image=${{ env.image }}"
          fi
          echo "make_args=${make_args}" >> $GITHUB_ENV
-         split_images=$(echo ${{ env.image}} | tr ',' ' '
+         # env.image may be a comma-separated list of images; we are
+         # thus creating a set of registry-specific variables from the
+         # images in the list
+         split_images=$(echo ${{ env.image }} | tr ',' ' '
          for img in ${split_images}; do
              image_host=$(echo ${img} | cut -d '/' -f 1)
              # Check for implicit Docker Hub
@@ -93,6 +96,7 @@ jobs:
                      d_registry=${image_host}
                      d_username="_json_key"
                      d_password=${{ secrets.GAR_PUSH_TOKEN }}
+                     ;;
                  *)
                      d_tag=""
                      d_registry=${image_host}
