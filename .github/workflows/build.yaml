@@ -94,7 +94,7 @@ jobs:
                  *-docker.pkg.dev)
                      d_tag="google_"
                      d_registry=${image_host}
-                     d_username="_json_key"
+                     d_username="_json_key_base64"
                      d_password=${{ secrets.GAR_PUSH_TOKEN }}
                      ;;
                  *)
