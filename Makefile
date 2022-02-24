@@ -1,7 +1,8 @@
 # We need three pieces of information to build the container:
 #  tag is the tag on the input DM Stack container.  It is mandatory.
 #  image is the Docker repository image we're pushing to; we can use the
-#   default if we don't specify it, which goes to Docker Hub
+#   default if we don't specify it, which goes to Docker Hub.  image
+#   may be a comma-separated list of target repositories.
 #  supplementary is an additional tag, which forces the build to an "exp_"
 #   (that is, experimental) tag and adds "_" plus the supplement at the end.
 
@@ -108,26 +109,40 @@ endif
 all: push
 
 # push assumes that the building user already has docker credentials
-#  to push to whatever the target repository (specified in $(image)) may be.
+#  to push to whatever the target repository or repositories (specified in
+#  $(image), possibly as a comma-separated list of targets) may be.
 push: image
-	$(DOCKER) push $(image):$(version)
-ifneq ($(ltype),)
-	$(DOCKER) tag $(image):$(version) $(image):$(ltype)
-	$(DOCKER) push $(image):$(ltype)
-endif
-ifneq ($(latest),)
-	$(DOCKER) tag $(image):$(version) $(image):$(latest)
-	$(DOCKER) push $(image):$(latest)
-endif
+	img=$$(echo $(image) | cut -d ',' -f 1) && \
+	more=$$(echo $(image) | cut -d ',' -f 2-) && \
+	$(DOCKER) push $${img}:$(version) && \
+	for m in $${more}; do \
+	    $(DOCKER) tag $${img}:$(version) $${m}:$(version) ; \
+	    $(DOCKER) push $${m}:$(version) ; \
+	done && \
+	if [ -n "$(ltype)" ]; then \
+	    $(DOCKER) tag $${img}:$(version) $${img}:$(ltype) ; \
+	    $(DOCKER) push $${img}:$(ltype) ; \
+	fi && \
+	if [ -n "$(latest)" ]; then \
+	    $(DOCKER) tag $${img}:$(version) $${img}:$(latest) ; \
+	    $(DOCKER) push $${img}:$(latest) ; \
+	fi
 
 # I keep getting this wrong, so make it work either way.
 build: image
 
 image: dockerfile
-	$(DOCKER) build ${platform} --progress=plain -t $(image):$(version) .
+	img=$$(echo $(image) | cut -d ',' -f 1) && \
+	more=$$(echo $(image) | cut -d ',' -f 2- | sed -e 's|,| |') && \
+	echo "more = $${more}" && \
+	$(DOCKER) build ${platform} --progress=plain -t $${img}:$(version) . && \
+	for m in $${more}; do \
+	    $(DOCKER) tag $${img}:$(version) $${m}:$(version) ; \
+	done
 
 dockerfile: clean
-	sed -e "s|{{IMAGE}}|$(image)|g" \
+	img=$$(echo $(image) | cut -d ',' -f 1) && \
+	sed -e "s|{{IMAGE}}|$${img})|g" \
 	    -e "s|{{VERSION}}|$(version)|g" \
 	    -e "s|{{INPUT}}|$(input)|g" \
 	    -e "s|{{TAG}}|$(tag)|g" \
