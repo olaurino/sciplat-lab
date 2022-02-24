@@ -79,7 +79,7 @@ jobs:
                      ;;
              esac
              case ${image_host} in
-                 docker.com | docker.io) | *.docker.com | *.docker.io)
+                 docker.com | docker.io | *.docker.com | *.docker.io)
                      d_tag="docker_"
                      d_registry="docker.io"
                      d_username=${{ secrets.DOCKER_USERNAME }}
