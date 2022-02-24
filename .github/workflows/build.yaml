@@ -67,7 +67,7 @@ jobs:
          # env.image may be a comma-separated list of images; we are
          # thus creating a set of registry-specific variables from the
          # images in the list
-         split_images=$(echo ${{ env.image }} | tr ',' ' '
+         split_images=$(echo ${{ env.image }} | tr ',' ' ')
          for img in ${split_images}; do
              image_host=$(echo ${img} | cut -d '/' -f 1)
              # Check for implicit Docker Hub
