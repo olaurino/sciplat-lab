@@ -109,10 +109,6 @@ jobs:
              echo "${d_tag}username=${d_username}" >> $GITHUB_ENV
              echo "${d_tag}password=${d_password}" >> $GITHUB_ENV
          done
-         # Force-disable GAR for the time being
-         echo "google_registry=''" >> $GITHUB_ENV
-         echo "google_username=''" >> $GITHUB_ENV
-         echo "google_password=''" >> $GITHUB_ENV
 
     # Only bother logging in to a given site if we're going to push the
     # container and we have credentials
