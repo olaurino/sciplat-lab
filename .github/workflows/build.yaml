@@ -91,13 +91,12 @@ jobs:
                      d_username="token"
                      d_password="${{ secrets.GHCR_PUSH_TOKEN}}"
                      ;;
-               # Come back to this later--the quoting is very tricky
-               #   *-docker.pkg.dev)
-               #      d_tag="google_"
-               #      d_registry="${image_host}"
-               #      d_username="_json_key_base64"
-               #      d_password="${{ secrets.GAR_PUSH_TOKEN }}"
-               #      ;;
+                 *-docker.pkg.dev)
+                    d_tag="google_"
+                    d_registry="${image_host}"
+                    d_username="_json_key_base64"
+                    d_password="${{ secrets.GAR_PUSH_TOKEN }}"
+                    ;;
                  *)
                      d_tag=""
                      d_registry="${image_host}"
