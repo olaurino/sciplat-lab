@@ -113,7 +113,7 @@ all: push
 #  $(image), possibly as a comma-separated list of targets) may be.
 push: image
 	img=$$(echo $(image) | cut -d ',' -f 1) && \
-	more=$$(echo $(image) | cut -d ',' -f 2-) && \
+	more=$$(echo $(image) | cut -d ',' -f 2- | tr ',' ' ') && \
 	$(DOCKER) push $${img}:$(version) && \
 	for m in $${more}; do \
 	    $(DOCKER) tag $${img}:$(version) $${m}:$(version) ; \
@@ -133,8 +133,7 @@ build: image
 
 image: dockerfile
 	img=$$(echo $(image) | cut -d ',' -f 1) && \
-	more=$$(echo $(image) | cut -d ',' -f 2- | sed -e 's|,| |') && \
-	echo "more = $${more}" && \
+	more=$$(echo $(image) | cut -d ',' -f 2- | tr ',' ' ') && \
 	$(DOCKER) build ${platform} --progress=plain -t $${img}:$(version) . && \
 	for m in $${more}; do \
 	    $(DOCKER) tag $${img}:$(version) $${m}:$(version) ; \
