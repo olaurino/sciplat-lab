@@ -141,7 +141,7 @@ image: dockerfile
 
 dockerfile: clean
 	img=$$(echo $(image) | cut -d ',' -f 1) && \
-	sed -e "s|{{IMAGE}}|$${img})|g" \
+	sed -e "s|{{IMAGE}}|$${img}|g" \
 	    -e "s|{{VERSION}}|$(version)|g" \
 	    -e "s|{{INPUT}}|$(input)|g" \
 	    -e "s|{{TAG}}|$(tag)|g" \
