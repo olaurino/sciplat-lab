@@ -122,10 +122,18 @@ push: image
 	if [ -n "$(ltype)" ]; then \
 	    $(DOCKER) tag $${img}:$(version) $${img}:$(ltype) ; \
 	    $(DOCKER) push $${img}:$(ltype) ; \
+	    for m in $${more}; do \
+	        $(DOCKER) tag $${img}:$(ltype) $${m}:$(ltype) ; \
+	        $(DOCKER) push $${m}:$(ltype) ; \
+	    done ; \
 	fi && \
 	if [ -n "$(latest)" ]; then \
 	    $(DOCKER) tag $${img}:$(version) $${img}:$(latest) ; \
 	    $(DOCKER) push $${img}:$(latest) ; \
+	    for m in $${more}; do \
+	        $(DOCKER) tag $${img}:$(latest) $${m}:$(latest) ; \
+	        $(DOCKER) push $${m}:$(latest) ; \
+	    done ; \
 	fi
 
 # I keep getting this wrong, so make it work either way.
