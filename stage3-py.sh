@@ -13,8 +13,14 @@ source ${LOADRSPSTACK}
 if [ -z "$(which mamba)" ]; then
     conda install -y mamba
 fi
+# Never allow the installation to upgrade rubin_env.  Generally enforcing
+# the pin is only needed for releases, where the current version may have
+# moved ahead.
+rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
+		    | jq -r '.[0].version')
 mamba install --no-banner -y \
       "jupyterlab>=3,<4" \
+      "rubin-env==${rubin_env_ver}" \
       ipykernel \
       jupyter-server-proxy \
       jupyter-packaging \
