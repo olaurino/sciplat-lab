@@ -82,7 +82,6 @@ mamba install --no-banner -y \
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
        nbconvert[webpdf] \
-       wfdispatcher \
        socketIO-client \
        nclib \
        jupyterlab_hdf \
