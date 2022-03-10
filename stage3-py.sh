@@ -21,6 +21,7 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 mamba install --no-banner -y \
       "jupyterlab>=3,<4" \
       "rubin-env==${rubin_env_ver}" \
+      "markupsafe>=2,<2.1" \
       ipykernel \
       jupyter-server-proxy \
       jupyter-packaging \
