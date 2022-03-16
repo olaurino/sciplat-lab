@@ -233,6 +233,7 @@ cmd="python3 -s -m jupyter labhub \
      --notebook-dir=${HOME} \
      --hub-prefix='/nb/hub' \
      --hub-host='${EXTERNAL_INSTANCE_URL}' \
+     --ContentsManager.allow_hidden=True \
      --FileContentsManager.hide_globs=[] \
      --KernelSpecManager.ensure_native_kernel=False \
      --LabApp.shutdown_no_activity_timeout=${IDLE_TIMEOUT} \
