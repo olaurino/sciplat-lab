@@ -79,7 +79,10 @@ mamba install --no-banner -y \
       bqplot \
       jupyterlab_execute_time \
       ipympl \
-      ciso8601
+      ciso8601 \
+      plotly \
+      dash \
+      jupyter-dash
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
        nbconvert[webpdf] \
