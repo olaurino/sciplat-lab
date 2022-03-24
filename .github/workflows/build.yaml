@@ -14,7 +14,7 @@ on:
       image:
         description: 'fully-qualified URI for output Docker image'
         required: false
-        default: 'docker.io/lsstsqre/sciplat-lab'
+        default: 'docker.io/lsstsqre/sciplat-lab,us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab'
         # someday, perhaps: 'ghcr.io/lsst-sqre/sciplat-lab'
       push:
         description: 'push resulting image; make empty or set to a YAML-false string to build but not push'
