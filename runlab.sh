@@ -164,8 +164,15 @@ copy_butler_credentials
 # Bump up node max storage to allow rebuild
 NODE_OPTIONS=${NODE_OPTIONS:-"--max-old-space-size=7168"}
 export NODE_OPTIONS
-# Set timeout
-IDLE_TIMEOUT=${IDLE_TIMEOUT:-"120000"}
+
+# SET VARIABLE DEFAULTS 
+NO_ACTIVITY_TIMEOUT=${NO_ACTIVITY_TIMEOUT:-"120000"}
+CULL_KERNEL_IDLE_TIMEOUT=${CULL_KERNEL_IDLE_TIMEOUT:-"43200"}
+CULL_KERNEL_CONNECTED=${CULL_KERNEL_CONNECTED:-"True"}
+CULL_KERNEL_INTERVAL=${CULL_KERNEL_INTERVAL:-"300"}
+CULL_TERMINAL_INACTIVE_TIMEOUT=${CULL_TERMINAL_INACTIVE_TIMEOUT:-"120000"}
+CULL_TERMINAL_INTERVAL=${CULL_TERMINAL_INTERVAL:-"300"}
+
 sync
 cd ${HOME}
 # Do /etc/skel copy (in case we didn't provision homedir but still need to
@@ -236,10 +243,14 @@ cmd="python3 -s -m jupyter labhub \
      --ContentsManager.allow_hidden=True \
      --FileContentsManager.hide_globs=[] \
      --KernelSpecManager.ensure_native_kernel=False \
-     --LabApp.shutdown_no_activity_timeout=${IDLE_TIMEOUT} \
-     --MappingKernelManager.cull_idle_timeout=43200 \
-     --MappingKernelManager.cull_connected=True \
-     --MappingKernelManager.default_kernel_name=lsst"
+     --LabApp.shutdown_no_activity_timeout=${NO_ACTIVITY_TIMEOUT} \
+     --MappingKernelManager.cull_idle_timeout=${CULL_KERNEL_IDLE_TIMEOUT} \
+     --MappingKernelManager.cull_connected=${CULL_KERNEL_CONNECTED} \
+     --MappingKernelManager.cull_interval=${CULL_KERNEL_INTERVAL} \
+     --MappingKernelManager.default_kernel_name=lsst \
+     --TerminalManager.cull_inactive_timeout=${CULL_TERMINAL_INACTIVE_TIMEOUT} \
+     --TerminalManager.cull_interval=${CULL_TERMINAL_INTERVAL}"
+
 if [ -n "${DEBUG}" ]; then
     cmd="${cmd} --debug --log-level=DEBUG"
     echo "----JupyterLab env----"
