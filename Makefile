@@ -33,8 +33,8 @@ ifeq ($(tag),)
 endif
 
 ifeq ($(image),)
-    image = docker.io/lsstsqre/sciplat-lab
-    # Some day this might be a ghcr.io default
+    image = docker.io/lsstsqre/sciplat-lab,us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab
+    # Some day this might add a ghcr.io default
 endif
 
 ifeq ($(input),)
