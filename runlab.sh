@@ -34,6 +34,11 @@ function copy_logging_profile() {
     fi
 }
 
+function set_log_line_limits() {
+    jldir="/opt/lsst/software/jupyterlab"
+    python3 "${jldir}/loglimits.py"
+}
+
 function copy_dircolors() {
     if [ !  -e "${HOME}/.dir_colors" ]; then
 	cp /etc/dircolors.ansi-universal ${HOME}/.dir_colors
@@ -140,6 +145,8 @@ source /etc/profile.d/local05-path.sh
 copy_logging_profile
 # Make ls colorization better
 copy_dircolors
+# Increase logged line limits
+set_log_line_limits
 # Retrieve image digest
 IMAGE_DIGEST=$(python -c 'import lsst.rsp;
 print(lsst.rsp.get_digest())')
