@@ -74,10 +74,29 @@ function copy_lsst_dask() {
 }
 
 function clear_dotlocal() {
+    # Once every site is running a new enough nublado2 to have the new
+    # RESET_USER_ENV variable instead, this can be removed.
     local dotlocal="${HOME}/.local"
     local now=$(date +%Y%m%d%H%M%S)
     if [ -d ${dotlocal} ]; then
         mv ${dotlocal} ${dotlocal}.${now}
+    fi
+}
+
+function reset_user_env() {
+    local now=$(date +%Y%m%d%H%M%S)
+    local reloc="${HOME}/.user_env.${now}"
+    mkdir -p "${reloc}"
+    local moved=""
+    for i in local cache jupyter; do
+	if [ -d "${HOME}/.${i}" ]; then
+	    mv "${HOME}/.${i}" "${reloc}"
+	    moved="yes"
+	fi
+    done
+    # If nothing was actually relocated, then do not keep the reloc directory
+    if [ -z "${moved}" ]; then
+	rmdir "${reloc}"
     fi
 }
 
@@ -121,9 +140,17 @@ if [ -z "${USER}" ]; then
     USER="$(id -u -n)"
 fi
 export USER
+# Preserve compatibility between CLEAR_DOTLOCAL and RESET_USER_ENV
+if [ -n "${RESET_USER_ENV}" ]; then
+    # If the newer variable is present, use it instead.
+    CLEAR_DOTLOCAL=""
+fi
 # Clear $HOME/.local if requested
 if [ -n "${CLEAR_DOTLOCAL}" ]; then
     clear_dotlocal
+fi
+if [ -n "${RESET_USER_ENV}" ]; then
+    reset_user_env
 fi
 # LOADRSPSTACK should be set, but if not...
 if [ -z "${LOADRSPSTACK}" ]; then
@@ -172,7 +199,7 @@ copy_butler_credentials
 NODE_OPTIONS=${NODE_OPTIONS:-"--max-old-space-size=7168"}
 export NODE_OPTIONS
 
-# SET VARIABLE DEFAULTS 
+# Set timeout variable defaults
 NO_ACTIVITY_TIMEOUT=${NO_ACTIVITY_TIMEOUT:-"120000"}
 CULL_KERNEL_IDLE_TIMEOUT=${CULL_KERNEL_IDLE_TIMEOUT:-"43200"}
 CULL_KERNEL_CONNECTED=${CULL_KERNEL_CONNECTED:-"True"}
