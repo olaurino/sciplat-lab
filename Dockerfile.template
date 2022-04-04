@@ -50,7 +50,7 @@ COPY pythonrc /etc/skel/.pythonrc
 COPY gitconfig /etc/skel/.gitconfig
 COPY git-credentials /etc/skel/.git-credentials
 COPY user_setups /etc/skel/notebooks/.user_setups
-COPY lsst_kernel.json loglimits.py selfculler.py \
+COPY lsst_kernel.json modify_settings.py selfculler.py \
       lsstlaunch.bash runlab.sh refreshnb.sh \
       prepuller.sh lsstwrapdask.bash lsst_dask.yml \
       20-logging.py \

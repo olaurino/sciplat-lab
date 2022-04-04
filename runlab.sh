@@ -34,9 +34,9 @@ function copy_logging_profile() {
     fi
 }
 
-function set_log_line_limits() {
+function modify_settings_files() {
     jldir="/opt/lsst/software/jupyterlab"
-    python3 "${jldir}/loglimits.py"
+    python3 "${jldir}/modify_settings.py"
 }
 
 function copy_dircolors() {
@@ -172,8 +172,6 @@ source /etc/profile.d/local05-path.sh
 copy_logging_profile
 # Make ls colorization better
 copy_dircolors
-# Increase logged line limits
-set_log_line_limits
 # Retrieve image digest
 IMAGE_DIGEST=$(python -c 'import lsst.rsp;
 print(lsst.rsp.get_digest())')
@@ -260,9 +258,10 @@ elif [ -n "${NONINTERACTIVE}" ]; then
     start_noninteractive
     exit 0 # Not reached
 else
-    # Create dask yml if we are an interactive Lab and not a worker
+    # All of these tasks should only be run if we are an interactive lab,
+    # rather than a noninteractive lab or a Dask worker.
     copy_lsst_dask
-    # Manage access token (again, only if we are a Lab)
+    modify_settings_files
     manage_access_token
 fi
 # The Rubin Lap App plus our environment should get the right hub settings
