@@ -25,9 +25,8 @@
 # The default is "push", and the first four are always done in strict linear
 #  order.
 # "clean" just removes the generated Dockerfile.
-# "dockerfile"
-#  generates the Dockerfile from the template, but does not build an image
-#  or push it.
+# "dockerfile" generates the Dockerfile from the template, but does not build
+#  an image or push it.
 # "image" builds the image with Docker but does not push it to a repository.
 # "push" (aka "all") also pushes the built image.  It assumes that the
 #  building user already has appropriate push credentials set.
@@ -37,20 +36,24 @@
 #  "supplementary" will be the tag to add to this image; no substitution will
 #  be done on either the input tag or the supplementary tag.  As with "push"
 #  it assumes that the building user has appropriate push credentials set.
+# There is no point in retagging without pushing, so "push" is always implicit
+#  in retag.
 
 ifeq ($(tag),)
     $(error tag must be set)
 endif
 
-# By default, we will push to all three targets.
+# By default, we will push to Docker Hub and GAR.  Eventually we expect
+# ghcr.io to replace Docker Hub.
 ifeq ($(image),)
-    image = docker.io/lsstsqre/sciplat-lab,us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab,ghcr.io/lsst-sqre/sciplat-lab
+    image = docker.io/lsstsqre/sciplat-lab,us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab
 endif
 
 ifeq ($(input),)
     input = docker.io/lsstsqre/centos:7-stack-lsst_distrib-
-    # You need to include the colon here, and the input tag has to
-    # end with $(tag)
+    # For one of the four build targets, you need to include the colon here,
+    # and the input tag has to end with $(tag).  For "retag" it's different
+    # and is explained below.
 endif
 
 # Some day we might use a different build tool.  If you have a new enough
@@ -171,7 +174,7 @@ clean:
 	rm -f Dockerfile
 
 # If input is the default, repoint it at the Docker Hub sciplat-lab image.
-# Someday this should probably be ghcr.io.
+# Someday this will likely be ghcr.io.
 retag:
 	inp="$(input)" && \
 	if [ "$${inp}" == "docker.io/lsstsqre/centos:7-stack-lsst_distrib-" ] ; then \
