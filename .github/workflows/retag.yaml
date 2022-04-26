@@ -1,25 +1,21 @@
-name: Manually triggered build of sciplat-lab container
+name: Manually triggered retag of sciplat-lab container
 
 on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'EUPS tag of input DM Pipelines Stack container'
+        description: 'Docker tag of input container'
         required: true
         default: ''
       supplementary:
-        description: 'Supplementary tag for experimental builds; yields output tag exp_tag_supplementary'
-        required: false
+        description: 'Additional value to tag container with'
+        required: true
         default: ''
       image:
         description: 'fully-qualified URI for output Docker image'
         required: false
         default: 'docker.io/lsstsqre/sciplat-lab,us-central1-docker.pkg.dev/rubin-shared-services-71ec/sciplat/sciplat-lab'
-        # someday we will want to add 'ghcr.io/lsst-sqre/sciplat-lab'
-      push:
-        description: 'push resulting image; make empty or set to a YAML-false string to build but not push'
-        required: false
-        default: 'true'
+        # Someday we will want to add 'ghcr.io/lsst-sqre/sciplat-lab'
 
 # We need actions/write if we want to do a GH App, and we need
 # packages/write to push to ghcr.io with GITHUB_TOKEN (currently not
@@ -43,26 +39,12 @@ jobs:
         echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_ENV
         echo "supplementary=${{ github.event.inputs.supplementary }}" >> $GITHUB_ENV
         echo "image=${{ github.event.inputs.image }}" >> $GITHUB_ENV
-        echo "push=${{ github.event.inputs.push }}">> $GITHUB_ENV
 
     - name: parse_env
       shell: bash
       run: |
-         case ${{ env.push }} in
-             ''|n|N|no|No|NO|false|False|FALSE|off|Off|OFF)
-                 echo "target=image" >> $GITHUB_ENV
-                 ;;
-             *)
-                 echo "target=push" >> $GITHUB_ENV
-                 ;;
-         esac
-         make_args="tag=${{ env.tag }}"
-         if [ -n "${{ env.supplementary }}" ]; then
-             make_args="${make_args} supplementary=${{ env.supplementary }}"
-         fi
-         if [ -n "${{ env.image }}" ]; then
-             make_args="${make_args} image=${{ env.image }}"
-         fi
+         make_args="tag=${{ env.tag }} supplementary=${{ env.supplementary }}"
+         make_args="${make_args} image=${{ env.image }}"
          echo "make_args=${make_args}" >> $GITHUB_ENV
          # env.image may be a comma-separated list of images; we are
          # thus creating a set of registry-specific variables from the
@@ -109,12 +91,10 @@ jobs:
              echo "${d_tag}password=${d_password}" >> $GITHUB_ENV
          done
 
-    # Only bother logging in to a given site if we're going to push the
-    # container and we have credentials
+    # Only bother logging in to a given site if we have credentials
     - name: Log in to Docker Hub repository
       if: >-
-        ((env.target == 'push') &&
-         (env.docker_registry != '') &&
+        ((env.docker_registry != '') &&
          (env.docker_username != '') &&
          (env.docker_password != ''))
       uses: docker/login-action@v1
@@ -124,8 +104,7 @@ jobs:
         password: ${{ env.docker_password }}
     - name: Log in to GitHub Container Registry
       if: >-
-        ((env.target == 'push') &&
-         (env.github_registry != '') &&
+        ((env.github_registry != '') &&
          (env.github_username != '') &&
          (env.github_password != ''))
       uses: docker/login-action@v1
@@ -135,8 +114,7 @@ jobs:
         password: ${{ env.github_password }}
     - name: Log in to Google Artifact Registry
       if: >-
-        ((env.target == 'push') &&
-         (env.google_registry != '') &&
+        ((env.google_registry != '') &&
          (env.google_username != '') &&
          (env.google_password != ''))
       uses: docker/login-action@v1
@@ -148,5 +126,4 @@ jobs:
     - name: build
       shell: bash
       run: |
-            make ${{ env.make_args }} ${{ env.target }}
-
+            make ${{ env.make_args }} retag
