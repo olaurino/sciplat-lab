@@ -177,7 +177,7 @@ clean:
 # Someday this will likely be ghcr.io.
 retag:
 	inp="$(input)" && \
-	if [ "$${inp}" == "docker.io/lsstsqre/centos:7-stack-lsst_distrib-" ] ; then \
+	if [ "$${inp}" = "docker.io/lsstsqre/centos:7-stack-lsst_distrib-" ] ; then \
 	    inp="docker.io/lsstsqre/sciplat-lab" ; \
 	fi && \
 	$(DOCKER) pull $${inp}:$(tag) && \
