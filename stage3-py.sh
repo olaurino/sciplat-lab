@@ -18,9 +18,10 @@ fi
 # moved ahead.
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 		    | jq -r '.[0].version')
+# Do the rest of the installation
 mamba install --no-banner -y \
-      "jupyterlab>=3,<3.4" \
       "rubin-env==${rubin_env_ver}" \
+      "jupyterlab>=3,<4" \
       jupyterhub \
       ipykernel \
       jupyter-server-proxy \
