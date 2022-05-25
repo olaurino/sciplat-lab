@@ -85,17 +85,18 @@ mamba install --no-banner -y \
       dash \
       jupyter-dash \
       imagemagick \
-      ffmpeg
+      ffmpeg \
+      orjson \
+      nbconvert-webpdf \
+      jupyterlab_hdf
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
-       nbconvert[webpdf] \
-       socketIO-client \
-       nclib \
-       jupyterlab_hdf \
-       lsst-efd-client \
-       jupyter_firefly_extensions \
-       lsst-rsp \
-       rsp-jupyter-extensions
+      socketio-client \
+      nclib \
+      lsst-efd-client \
+      jupyter_firefly_extensions \
+      lsst-rsp \
+      rsp-jupyter-extensions
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
@@ -105,7 +106,7 @@ stacktop="/opt/lsst/software/stack/conda/current"
 rm -rf ${stacktop}/envs/${LSST_CONDA_ENV_NAME}/share/jupyter/kernels/python3
 
 # Clear Mamba and pip caches
-mamba clean -a -y
+mamba clean -a -y --no-banner
 rm -rf /root/.cache/pip
 
 # Create package version docs.
