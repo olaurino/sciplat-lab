@@ -83,7 +83,9 @@ mamba install --no-banner -y \
       ciso8601 \
       plotly \
       dash \
-      jupyter-dash
+      jupyter-dash \
+      imagemagick \
+      ffmpeg
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
        nbconvert[webpdf] \
