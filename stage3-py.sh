@@ -87,6 +87,7 @@ mamba install --no-banner -y \
       imagemagick \
       ffmpeg \
       orjson \
+      nbconvert \
       nbconvert-webpdf
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
