@@ -87,12 +87,12 @@ mamba install --no-banner -y \
       imagemagick \
       ffmpeg \
       orjson \
-      nbconvert-webpdf \
-      jupyterlab_hdf
+      nbconvert-webpdf
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
       socketio-client \
       nclib \
+      jupyterlab_hdf \
       lsst-efd-client \
       jupyter_firefly_extensions \
       lsst-rsp \
