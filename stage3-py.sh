@@ -87,8 +87,7 @@ mamba install --no-banner -y \
       imagemagick \
       ffmpeg \
       orjson \
-      nbconvert-webpdf \
-      'ruamel.yaml>=0.15.0,<0.16.0'
+      nbconvert-webpdf
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
       socketio-client \
