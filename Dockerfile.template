@@ -36,7 +36,7 @@ RUN  ${BLD}/stage3-py.sh
 ENV  NODE_OPTIONS="--max-old-space-size=7168 --max-http-header-size=16384"
 RUN  mkdir -p /usr/local/etc/jupyter
 # We update the config during stage 4.
-COPY jupyter_notebook_config.json /usr/local/etc/jupyter
+COPY jupyter_server_config.json /usr/local/etc/jupyter
 COPY stage4-jup.sh ${BLD}
 RUN  ${BLD}/stage4-jup.sh
 COPY local01-nbstripjq.sh local02-hub.sh local03-showrspnotice.sh  \
