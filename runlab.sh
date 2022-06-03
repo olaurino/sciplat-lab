@@ -132,7 +132,13 @@ function start_noninteractive() {
 # Start of mainline code
 
 # If DEBUG is set to a non-empty value, turn on debugging
+# However...we want to redirect stderr to stdout first, because the
+# Google log handler thinks that anything on stderr is an error.
 if [ -n "${DEBUG}" ]; then
+    # This will, unfortunately, also redirect *actual* errors...but, hey,
+    # if we're running under DEBUG anyway we know things are weird and
+    # verbose.
+    exec 2>&1
     set -x
 fi
 # Set USER if it isn't already

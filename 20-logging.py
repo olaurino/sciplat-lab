@@ -10,14 +10,14 @@ be recopied.
 
 import logging
 import os
+import sys
 
 
 customlogger = False
 
 try:
-    from lsst.rsp import (
-        IPythonHandler, forward_lsst_log
-    )
+    from lsst.rsp import IPythonHandler, forward_lsst_log
+
     customlogger = True
 except ImportError:
     pass  # Probably a container that doesn't have our new code
@@ -30,9 +30,12 @@ debug = os.getenv("DEBUG")
 if debug:
     t_level = "DEBUG"
     level = logging.DEBUG
+# Set up WARNING and above as stderr, below that to stdout.
+handlers = [
+    logging.StreamHandler(level=logging.WARNING),
+    logging.StreamHandler(level=level, stream=sys.stdout),
+]
 if customlogger:
     forward_lsst_log(t_level)
-    logging.basicConfig(level=level, force=True,
-                        handlers=[IPythonHandler()])
-else:
-    logging.basicConfig(level=level, force=True)
+    handlers = [IPythonHandler()]
+logging.basicConfig(force=True, handlers=handlers)
