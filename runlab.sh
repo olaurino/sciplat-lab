@@ -270,8 +270,9 @@ else
     modify_settings_files
     manage_access_token
 fi
-# The Rubin Lap App plus our environment should get the right hub settings
-# This will need to change for JL 3
+
+# log-level should stay WARN; we configure lower-level loggers in
+# jupyter_server_config.py
 cmd="python3 -s -m jupyter labhub \
      --ip=0.0.0.0 \
      --port=8888 \
@@ -279,6 +280,7 @@ cmd="python3 -s -m jupyter labhub \
      --notebook-dir=${HOME} \
      --hub-prefix=/nb/hub \
      --hub-host=${EXTERNAL_INSTANCE_URL} \
+     --log-level=WARN \
      --ContentsManager.allow_hidden=True \
      --FileContentsManager.hide_globs=[] \
      --KernelSpecManager.ensure_native_kernel=False \
@@ -291,9 +293,11 @@ cmd="python3 -s -m jupyter labhub \
      --TerminalManager.cull_interval=${CULL_TERMINAL_INTERVAL}"
 
 if [ -n "${DEBUG}" ]; then
-    cmd="${cmd} --debug --log-level=DEBUG"
-    echo "----JupyterLab env----"
-    env | sort
+    cmd="${cmd} --debug"
+    echo "----JupyterLab env vars----"
+    export -p
+    echo "----JupyterLab shell functions----"
+    export -f
     echo "----------------------"
 fi
 echo "JupyterLab command: '${cmd}'"
