@@ -1,24 +1,27 @@
 import os
 import sys
 
+# Set the standard console logger to log on WARNING (in jupyterlab startup).
+#
+# Create a new stdout logger on INFO and below; only use DEBUG if the
+# environment variable DEBUG is set.
+
 level="INFO"
 if os.getenv("DEBUG"):
     level="DEBUG"
 
-c.ServerApp.logging_config = {
+c.Application.logging_config = {
     'handlers': {
         'stdout': {
             'class': 'logging.StreamHandler',
             'level': level,
             'stream': 'ext://sys.stdout'
-        },
-        'console': {
-            'level': 'WARN',
         }
     },
     'loggers': {
-        'console': {
-            'handlers': [ 'console', 'stdout' ],
+        'stdout': {
+            'level': level,
+            'handlers': [ 'stdout' ],
         }
     }
 }

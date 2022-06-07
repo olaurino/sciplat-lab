@@ -132,13 +132,9 @@ function start_noninteractive() {
 # Start of mainline code
 
 # If DEBUG is set to a non-empty value, turn on debugging
-# However...we want to redirect stderr to stdout first, because the
-# Google log handler thinks that anything on stderr is an error.
+# This will generate a lot of sort-of-spurious errors, in that Google Logging
+# believes anything coming out on stderr to be an error.
 if [ -n "${DEBUG}" ]; then
-    # This will, unfortunately, also redirect *actual* errors...but, hey,
-    # if we're running under DEBUG anyway we know things are weird and
-    # verbose.
-    exec 2>&1
     set -x
 fi
 # Set USER if it isn't already
@@ -271,8 +267,9 @@ else
     manage_access_token
 fi
 
-# log-level should stay WARN; we configure lower-level loggers in
-# jupyter_server_config.py
+# Set log-level to WARN so that stderr only gets WARNING and above.  We
+# set up a stdout logger for lower-priority messages in
+# jupyter_server_config.py .
 cmd="python3 -s -m jupyter labhub \
      --ip=0.0.0.0 \
      --port=8888 \
@@ -284,7 +281,7 @@ cmd="python3 -s -m jupyter labhub \
      --ContentsManager.allow_hidden=True \
      --FileContentsManager.hide_globs=[] \
      --KernelSpecManager.ensure_native_kernel=False \
-     --LabApp.shutdown_no_activity_timeout=${NO_ACTIVITY_TIMEOUT} \
+     --ServerApp.shutdown_no_activity_timeout=${NO_ACTIVITY_TIMEOUT} \
      --MappingKernelManager.cull_idle_timeout=${CULL_KERNEL_IDLE_TIMEOUT} \
      --MappingKernelManager.cull_connected=${CULL_KERNEL_CONNECTED} \
      --MappingKernelManager.cull_interval=${CULL_KERNEL_INTERVAL} \
