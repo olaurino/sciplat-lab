@@ -36,7 +36,8 @@ RUN  ${BLD}/stage3-py.sh
 ENV  NODE_OPTIONS="--max-old-space-size=7168 --max-http-header-size=16384"
 RUN  mkdir -p /usr/local/etc/jupyter
 # We update the config during stage 4.
-COPY jupyter_server_config.json /usr/local/etc/jupyter
+COPY jupyter_server_config.json jupyter_server_config.py \
+      /usr/local/etc/jupyter/
 COPY stage4-jup.sh ${BLD}
 RUN  ${BLD}/stage4-jup.sh
 COPY local01-nbstripjq.sh local02-hub.sh local03-showrspnotice.sh  \
@@ -50,7 +51,7 @@ COPY pythonrc /etc/skel/.pythonrc
 COPY gitconfig /etc/skel/.gitconfig
 COPY git-credentials /etc/skel/.git-credentials
 COPY user_setups /etc/skel/notebooks/.user_setups
-COPY lsst_kernel.json modify_settings.py selfculler.py \
+COPY lsst_kernel.json modify_settings.py \
       lsstlaunch.bash runlab.sh refreshnb.sh \
       prepuller.sh lsstwrapdask.bash lsst_dask.yml \
       20-logging.py \
