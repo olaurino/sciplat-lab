@@ -88,7 +88,8 @@ mamba install --no-banner -y \
       ffmpeg \
       orjson \
       nbconvert \
-      nbconvert-webpdf
+      nbconvert-webpdf \
+      astroplan
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
       socketio-client \
