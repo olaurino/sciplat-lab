@@ -16,80 +16,13 @@ fi
 # Never allow the installation to upgrade rubin_env.  Generally enforcing
 # the pin is only needed for releases, where the current version may have
 # moved ahead.
+#
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 		    | jq -r '.[0].version')
 # Do the rest of the installation
 mamba install --no-banner -y \
       "rubin-env==${rubin_env_ver}" \
-      "jupyterlab>=3,<4" \
-      jupyterhub \
-      ipykernel \
-      jupyter-server-proxy \
-      jupyter-packaging \
-      geoviews \
-      cookiecutter \
-      nbval \
-      pyshp \
-      pypandoc \
-      astroquery \
-      ipywidgets \
-      ipyevents \
-      bokeh \
-      cloudpickle \
-      fastparquet \
-      paramnb \
-      ginga \
-      bqplot \
-      ipyvolume \
-      papermill \
-      dask \
-      gcsfs \
-      snappy \
-      distributed \
-      dask-kubernetes \
-      "holoviews[recommended]" \
-      datashader \
-      python-snappy \
-      graphviz \
-      mysqlclient \
-      hvplot \
-      intake \
-      intake-parquet \
-      toolz \
-      partd \
-      nbdime \
-      dask_labextension \
-      numba \
-      awkward \
-      awkward-numba \
-      pyvo \
-      jupyterlab_iframe \
-      jupyterlab_widgets \
-      astrowidgets \
-      sidecar \
-      python-socketio \
-      freetype-py \
-      terminado \
-      "nodejs>=16" \
-      yarn \
-      jedi \
-      xarray \
-      jupyter_bokeh \
-      pyviz_comms \
-      pythreejs \
-      bqplot \
-      jupyterlab_execute_time \
-      ipympl \
-      ciso8601 \
-      plotly \
-      dash \
-      jupyter-dash \
-      imagemagick \
-      ffmpeg \
-      orjson \
-      nbconvert \
-      nbconvert-webpdf \
-      astroplan
+      "rubin-env-rsp==${rubin_env_ver}"
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
       socketio-client \
