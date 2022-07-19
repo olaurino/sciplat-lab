@@ -39,8 +39,8 @@ python3 -m ipykernel install --name 'LSST'
 stacktop="/opt/lsst/software/stack/conda/current"
 rm -rf ${stacktop}/envs/${LSST_CONDA_ENV_NAME}/share/jupyter/kernels/python3
 
-# Clear Mamba and pip caches
-mamba clean -a -y --no-banner
+# Clear pip cache
+# mamba clean -a -y --no-banner
 rm -rf /root/.cache/pip
 
 # Create package version docs.
