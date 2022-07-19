@@ -21,8 +21,7 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 		    | jq -r '.[0].version')
 # Do the rest of the installation
 mamba install --no-banner -y \
-      "rubin-env-rsp==${rubin_env_ver}"  \
-      "jupyter"  # not sure how jupyterlab doesn't depend on this...
+      "rubin-env-rsp==${rubin_env_ver}"
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
       socketio-client \
