@@ -270,7 +270,7 @@ fi
 # Set log-level to WARN so that stderr only gets WARNING and above.  We
 # set up a stdout logger for lower-priority messages in
 # jupyter_server_config.py .
-cmd="jupyter labhub \
+cmd="python3 -s -m jupyter labhub \
      --ip=0.0.0.0 \
      --port=8888 \
      --no-browser \
