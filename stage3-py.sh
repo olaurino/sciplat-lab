@@ -16,7 +16,6 @@ fi
 # Never allow the installation to upgrade rubin_env.  Generally enforcing
 # the pin is only needed for releases, where the current version may have
 # moved ahead.
-#
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 		    | jq -r '.[0].version')
 # Do the rest of the installation
