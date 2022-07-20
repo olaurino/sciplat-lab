@@ -20,76 +20,7 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 		    | jq -r '.[0].version')
 # Do the rest of the installation
 mamba install --no-banner -y \
-      "rubin-env==${rubin_env_ver}" \
-      "jupyterlab>=3,<4" \
-      jupyterhub \
-      ipykernel \
-      jupyter-server-proxy \
-      jupyter-packaging \
-      geoviews \
-      cookiecutter \
-      nbval \
-      pyshp \
-      pypandoc \
-      astroquery \
-      ipywidgets \
-      ipyevents \
-      bokeh \
-      cloudpickle \
-      fastparquet \
-      paramnb \
-      ginga \
-      bqplot \
-      ipyvolume \
-      papermill \
-      dask \
-      gcsfs \
-      snappy \
-      distributed \
-      dask-kubernetes \
-      "holoviews[recommended]" \
-      datashader \
-      python-snappy \
-      graphviz \
-      mysqlclient \
-      hvplot \
-      intake \
-      intake-parquet \
-      toolz \
-      partd \
-      nbdime \
-      dask_labextension \
-      numba \
-      awkward \
-      awkward-numba \
-      pyvo \
-      jupyterlab_iframe \
-      jupyterlab_widgets \
-      astrowidgets \
-      sidecar \
-      python-socketio \
-      freetype-py \
-      terminado \
-      "nodejs>=16" \
-      yarn \
-      jedi \
-      xarray \
-      jupyter_bokeh \
-      pyviz_comms \
-      pythreejs \
-      bqplot \
-      jupyterlab_execute_time \
-      ipympl \
-      ciso8601 \
-      plotly \
-      dash \
-      jupyter-dash \
-      imagemagick \
-      ffmpeg \
-      orjson \
-      nbconvert \
-      nbconvert-webpdf \
-      astroplan
+      "rubin-env-rsp==${rubin_env_ver}"
 # These are the things that are not available on conda-forge.
 pip install --upgrade \
       socketio-client \
@@ -107,7 +38,7 @@ python3 -m ipykernel install --name 'LSST'
 stacktop="/opt/lsst/software/stack/conda/current"
 rm -rf ${stacktop}/envs/${LSST_CONDA_ENV_NAME}/share/jupyter/kernels/python3
 
-# Clear Mamba and pip caches
+# Clear mamba and pip caches
 mamba clean -a -y --no-banner
 rm -rf /root/.cache/pip
 
