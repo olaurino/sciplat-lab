@@ -17,7 +17,7 @@ fi
 # the pin is only needed for releases, where the current version may have
 # moved ahead.
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
-		    | jq -r '.[0].version')
+                    | jq -r '.[0].version')
 # Do the rest of the installation
 mamba install --no-banner -y \
       "rubin-env==${rubin_env_ver}" \
@@ -91,7 +91,12 @@ mamba install --no-banner -y \
       nbconvert-webpdf \
       astroplan
 # These are the things that are not available on conda-forge.
-pip install --upgrade \
+# Note that we are not installing with `--upgrade`.  That is so that if
+# lower-level layers have already installed the package (e.g. T&S may have
+# already installed lsst-efd-client), pinned to a version they need, we won't
+# upgrade it.  But if it isn't already installed, we'll just take the latest
+# available.
+pip install \
       socketio-client \
       nclib \
       jupyterlab_hdf \
