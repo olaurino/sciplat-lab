@@ -34,6 +34,8 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 # Do the rest of the installation
 mamba install --no-banner -y \
       "rubin-env-rsp==${rubin_env_ver}"
+# Experimental
+mamba install --no-banner -y jupyterlab=3.4.3
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
 # lower-level layers have already installed the package (e.g. T&S may have
