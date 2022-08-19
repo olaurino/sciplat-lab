@@ -31,7 +31,7 @@ mamba install --no-banner -y \
 # This may or may not work
 #
 echo "Installing custom JupyterLab"
-pip install git+https://github.com/lsst-sqre/jupyterlab.git@tickets/DM-34590-3.4.x
+pip install git+https://github.com/lsst-sqre/jupyterlab.git@tickets/DM-35930-3.4.x
 echo "JupyterLab installed"
 pip install \
       socketio-client \
