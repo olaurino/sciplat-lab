@@ -27,6 +27,12 @@ mamba install --no-banner -y \
 # already installed lsst-efd-client), pinned to a version they need, we won't
 # upgrade it.  But if it isn't already installed, we'll just take the latest
 # available.
+#
+# This may or may not work
+#
+echo "Installing custom JupyterLab"
+pip install git+https://github.com/lsst-sqre/jupyterlab.git@tickets/DM-34590-3.4.x
+echo "JupyterLab installed"
 pip install \
       socketio-client \
       nclib \
