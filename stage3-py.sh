@@ -2,6 +2,8 @@
 set -e
 
 install_custom_jupyterlab () {
+    # cf https://github.com/mamba-org/mamba/issues/412
+    conda remove -y --force-remove jupyterlab
     cd ${BLD}
     git clone -b tickets/DM-35930-3.4.x https://github.com/lsst-sqre/jupyterlab
     cd jupyterlab
