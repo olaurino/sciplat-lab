@@ -1,5 +1,16 @@
 #!/bin/sh
 set -e
+
+install_custom_jupyterlab () {
+    cd ${BLD}
+    git clone -b tickets/DM-35930-3.4.x https://github.com/lsst-sqre/jupyterlab
+    cd jupyterlab
+    pip install -e ".[dev,test]"
+    jlpm install
+    jlpm run build:core
+    jupyter lab build
+}
+
 #This commented-out bit, plus changing the definition of LOADRSPSTACK in
 # Dockerfile.template, will clone the environment rather than installing
 # into the stack environment itself.  This adds 60% or so to the container
@@ -31,7 +42,7 @@ mamba install --no-banner -y \
 # This may or may not work
 #
 echo "Installing custom JupyterLab"
-pip install git+https://github.com/lsst-sqre/jupyterlab.git@tickets/DM-35930-3.4.x
+install_custom_jupyterlab
 echo "JupyterLab installed"
 pip install \
       socketio-client \

@@ -271,6 +271,7 @@ fi
 # set up a stdout logger for lower-priority messages in
 # jupyter_server_config.py .
 cmd="python3 -s -m jupyter labhub \
+     --dev-mode \
      --ip=0.0.0.0 \
      --port=8888 \
      --no-browser \
