@@ -2,15 +2,29 @@
 set -e
 
 install_custom_jupyterlab () {
-    # cf https://github.com/mamba-org/mamba/issues/412
+    #
+    # This will no longer be necessary when xtermjs 4.19 is available in
+    # upstream builds.
+    #
     conda remove -y --force-remove jupyterlab
     cd ${BLD}
-    git clone -b tickets/DM-35930-3.4.x https://github.com/lsst-sqre/jupyterlab
+    git clone -b force_xterm https://github.com/lsst-sqre/jupyterlab
     cd jupyterlab
-    pip install -e ".[dev,test]"
+    npm cache clean --force  # Make sure we start clean
+    pip install --no-deps --force-reinstall -e .
+    jupyter lab clean --all
     jlpm install
-    jlpm run build:core
-    jupyter lab build
+    cd jupyterlab/staging
+    rm yarn.lock
+    # Reinstall all the core modules -- package.json forces xterm version
+    jlpm
+    jlpm run build:prod  # Rebuild with new dependency
+    # Back up top
+    cd ../..
+    jupyter lab clean --all
+    jupyter lab build --dev-build=False --minimize=False
+    # I don't think this next stage helps any, but...
+    pip install --no-deps --force-reinstall .
 }
 
 #This commented-out bit, plus changing the definition of LOADRSPSTACK in
@@ -32,22 +46,20 @@ fi
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
                     | jq -r '.[0].version')
 # Do the rest of the installation
+# Skip for now to get custom JL installed first
 mamba install --no-banner -y \
       "rubin-env-rsp==${rubin_env_ver}"
-# Experimental
-mamba install --no-banner -y jupyterlab=3.4.3
+# Until upstream contains at least xtermjs 4.19, we need to install a
+# custom JL that does contain it.
+echo "Installing custom JupyterLab"
+install_custom_jupyterlab
+echo "Custom JupyterLab installed"
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
 # lower-level layers have already installed the package (e.g. T&S may have
 # already installed lsst-efd-client), pinned to a version they need, we won't
 # upgrade it.  But if it isn't already installed, we'll just take the latest
 # available.
-#
-# This may or may not work
-#
-echo "Installing custom JupyterLab"
-install_custom_jupyterlab
-echo "JupyterLab installed"
 pip install \
       socketio-client \
       nclib \
