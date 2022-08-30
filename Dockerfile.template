@@ -54,7 +54,8 @@ COPY user_setups /etc/skel/notebooks/.user_setups
 COPY lsst_kernel.json modify_settings.py \
       lsstlaunch.bash runlab.sh refreshnb.sh \
       prepuller.sh lsstwrapdask.bash lsst_dask.yml \
-      20-logging.py 00_READONLY.md \
+      20-logging.py \
+      00_WARNING_README.md.template warning-tutorial-notebooks.md \
       ${jl}/
 COPY noninteractive /opt/lsst/software/jupyterlab/noninteractive/     
 # Mount configmap at ^^ command/command.json

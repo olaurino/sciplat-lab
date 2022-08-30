@@ -30,39 +30,77 @@ for url in ${urllist}; do
     #  a whole bunch of removed notebook outputs in it.
     # We will try to do the right thing if it's r/w, but...at your own risk
     if ! [ -d "${dirname}" ]; then
-	cd "${HOME}/notebooks" && \
-	    git clone --depth 1 ${repo} -b ${branch} && \
-            cp /opt/lsst/software/jupyterlab/00_READONLY.md "${dirname}" && \
+        cd "${HOME}/notebooks" && \
+            git clone --depth 1 ${repo} -b ${branch} && \
             chmod -R ugo-w "${dirname}"
     else
-	cd "${dirname}"
-	if [ "$(pwd)" != "${dirname}" ]; then
-	    echo 1>&2 "Could not find repository in ${dirname}"
-	else
-	    dirty=0
-	    otherbranch=0
-	    currentbr=$(git rev-parse --abbrev-ref HEAD)
-	    if [ "${currentbr}" != "${branch}" ]; then
-		otherbranch=1
-	    fi
-	    # If we have uncommited changes, stash, then we will pop back and
-	    #  apply after pull
-	    if ! git diff-files --quiet --ignore-submodules --; then
-		git stash
-		dirty=1
-	    fi
-	    # Do we need to change branches?
-	    if [ "${otherbranch}" -ne 0 ]; then
-		git checkout ${branch}
-	    fi
-	    git pull
-	    if [ "${otherbranch}" -ne 0 ]; then
-		git checkout ${currentbr}
-	    fi
-	    if [ "${dirty}" -ne 0 ]; then
-		git stash apply
-	    fi
-	fi
+        cd "${dirname}"
+        if [ "$(pwd)" != "${dirname}" ]; then
+            echo 1>&2 "Could not find repository in ${dirname}"
+        else
+            dirty=0
+            otherbranch=0
+            rw=0
+            upstream=$(git remote -v | grep origin | grep fetch \
+                           | awk '{print $2}')
+            repo=$(basename "${dirname}")
+            firstfile=$(ls -1 | head -1)
+            if [ -n "${firstfile}" ]; then
+                if [ -w "${firstfile}" ]; then
+                    # We were already read/write...shenanigans
+                    rw=1
+                fi
+            fi
+            if [ "${rw}" -eq 0 ]; then
+                # Temporarily make branch writeable
+                chmod -R u+w "${dirname}"
+            fi
+            currentbr=$(git rev-parse --abbrev-ref HEAD)
+            if [ "${currentbr}" != "${branch}" ]; then
+                otherbranch=1
+            fi
+            # If we have uncommited changes, stash, then we will pop back and
+            #  apply after pull
+            if ! git diff-files --quiet --ignore-submodules --; then
+                git stash
+                dirty=1
+            fi
+            # Do we need to change branches?
+            if [ "${otherbranch}" -ne 0 ]; then
+                git checkout ${branch}
+            fi
+            git pull
+            if [ "${otherbranch}" -ne 0 ]; then
+                git checkout ${currentbr}
+            fi
+            if [ "${dirty}" -ne 0 ]; then
+                git stash apply
+            fi
+            if [ "${rw}" -ne 0 ] || \
+                   [ "${dirty}" -ne 0 ] || \
+                   [ "${otherbranch}" -ne 0 ]; then
+                # We need to drop the warning in, because the user did not
+                # leave it read-only and on the default branch.
+                #
+                # In short, they are in an unsupported state, and we
+                # recommend they delete the directory and get a new one next
+                # time they launch a lab.
+                jl=/opt/lsst/software/jupyterlab                
+                sed -e "s|{{DIR}}|${repo}|" \
+                    -e "s|{{BRANCH}}|${branch}|" \
+                    -e "s|{{UPSTREAM}}|${upstream}|" \
+                    "${jl}/00_WARNING_README.md.template" > \
+                    ${dirname}/00_WARNING_README.md
+                if [ -f "${jl}/warning-${repo}.md" ]; then
+                    cat "${jl}/warning-${repo}.md" >> \
+                        ${dirname}/00_WARNING_README.md
+                fi
+            fi
+            if [ "${rw}" -eq 0 ]; then
+                # Change it back to read-only
+                chmod -R ugo-w "${dirname}"
+            fi
+        fi
     fi
 done
 cd "${origdir}" # In case we were sourced and not in a subshell
