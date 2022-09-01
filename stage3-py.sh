@@ -53,7 +53,10 @@ mamba install --no-banner -y \
 # custom JL that does contain it.
 echo "Installing custom JupyterLab"
 install_custom_jupyterlab
-echo "Custom JupyterLab installed"
+#echo "Custom JupyterLab installed"
+# Next, things on conda-forge not yet rolled into rubin-rsp-env
+mamba install --no-banner -y \
+      jupyterlab-variableinspector
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
 # lower-level layers have already installed the package (e.g. T&S may have
