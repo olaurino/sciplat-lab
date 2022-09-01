@@ -49,14 +49,14 @@ rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
 # Skip for now to get custom JL installed first
 mamba install --no-banner -y \
       "rubin-env-rsp==${rubin_env_ver}"
+# Next, things on conda-forge not yet rolled into rubin-rsp-env
+mamba install --no-banner -y \
+      jupyterlab-variableinspector
 # Until upstream contains at least xtermjs 4.19, we need to install a
 # custom JL that does contain it.
 echo "Installing custom JupyterLab"
 install_custom_jupyterlab
-#echo "Custom JupyterLab installed"
-# Next, things on conda-forge not yet rolled into rubin-rsp-env
-mamba install --no-banner -y \
-      jupyterlab-variableinspector
+echo "Custom JupyterLab installed"
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
 # lower-level layers have already installed the package (e.g. T&S may have
