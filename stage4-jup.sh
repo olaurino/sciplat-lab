@@ -32,10 +32,10 @@ done
 jupyter labextension disable \
 	"@jupyterlab/filebrowser-extension:share-file"
 
-# Rebuild the world.
+# Rebuild the world.  Again.
 npm cache clean --force
-jupyter lab clean
-jupyter lab build --dev-build=False
+jupyter lab clean --all
+jupyter lab build --dev-build=False --minimize=False
 
 # List installed labextensions and put them into a format we could consume
 #  for installation
