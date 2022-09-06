@@ -1,32 +1,6 @@
 #!/bin/sh
 set -e
 
-install_custom_jupyterlab () {
-    #
-    # This will no longer be necessary when xtermjs 4.19 is available in
-    # upstream builds.
-    #
-    conda remove -y --force-remove jupyterlab
-    cd ${BLD}
-    git clone -b force_xterm https://github.com/lsst-sqre/jupyterlab
-    cd jupyterlab
-    npm cache clean --force  # Make sure we start clean
-    pip install --no-deps --force-reinstall -e .
-    jupyter lab clean --all
-    jlpm install
-    cd jupyterlab/staging
-    rm yarn.lock
-    # Reinstall all the core modules -- package.json forces xterm version
-    jlpm
-    jlpm run build:prod  # Rebuild with new dependency
-    # Back up top
-    cd ../..
-    jupyter lab clean --all
-    jupyter lab build --dev-build=False --minimize=False
-    # I don't think this next stage helps any, but...
-    pip install --no-deps --force-reinstall .
-}
-
 #This commented-out bit, plus changing the definition of LOADRSPSTACK in
 # Dockerfile.template, will clone the environment rather than installing
 # into the stack environment itself.  This adds 60% or so to the container
@@ -52,11 +26,6 @@ mamba install --no-banner -y \
 # Next, things on conda-forge not yet rolled into rubin-rsp-env
 mamba install --no-banner -y \
       jupyterlab-variableinspector
-# Until upstream contains at least xtermjs 4.19, we need to install a
-# custom JL that does contain it.
-echo "Installing custom JupyterLab"
-install_custom_jupyterlab
-echo "Custom JupyterLab installed"
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
 # lower-level layers have already installed the package (e.g. T&S may have
