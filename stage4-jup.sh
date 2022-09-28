@@ -39,4 +39,4 @@ jupyter lab build --dev-build=False --minimize=False
 #  for installation
 jupyter labextension list 2>&1 | \
       grep '^      ' | grep -v ':' | grep -v 'OK\*' | \
-      awk '{print $1,$2}' | tr ' ' '@' > ${verdir}/labext.txt
+      awk '{print $1,$2}' | tr ' ' '@' | sort > ${verdir}/labext.txt
