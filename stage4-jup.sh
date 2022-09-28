@@ -7,9 +7,9 @@ svxt="jupyter_firefly_extensions \
       jupyterlab_iframe"
 nbxt="widgetsnbextension"
 lbxt="ipyvolume \
-      jupyterlab_iframe \
       ipyevents \
-      jupyter_firefly_extensions"
+      jupyter_firefly_extensions \
+      jupyterlab_iframe"
 
 # Don't understand why
 #  jupyter serverextension enable panel.io.jupyter_server_extension
@@ -33,8 +33,6 @@ jupyter labextension disable \
 	"@jupyterlab/filebrowser-extension:share-file"
 
 # Rebuild the world.  Again.
-npm cache clean --force
-jupyter lab clean --all
 jupyter lab build --dev-build=False --minimize=False
 
 # List installed labextensions and put them into a format we could consume
