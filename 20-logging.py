@@ -3,9 +3,12 @@
 At startup, if ${HOME}/.ipython/profile_default/startup/20-logging.py does
 not exist, this file will be copied to it from /opt/lsst/software/jupyterlab.
 
-If you don't like what it does, create an empty file at
- ${HOME}/.ipython/profile_default/startup/20-logging.py and it will not
-be recopied.
+It will also be copied if that file exists but is an earlier standard version
+(as determined via sha256sum).
+
+If you don't like what it does, create an empty file (or one that does what
+you want) at ${HOME}/.ipython/profile_default/startup/20-logging.py and it
+will not be recopied.
 """
 
 import logging
@@ -31,10 +34,11 @@ if debug:
     t_level = "DEBUG"
     level = logging.DEBUG
 # Set up WARNING and above as stderr, below that to stdout.
-handlers = [
-    logging.StreamHandler(level=logging.WARNING),
-    logging.StreamHandler(level=level, stream=sys.stdout),
-]
+warnhandler = logging.StreamHandler(stream=sys.stderr)
+warnhandler.setLevel(logging.WARNING)
+lowhandler = logging.StreamHandler(stream=sys.stdout)
+lowhandler.setLevel(level)
+handlers = [warnhandler, lowhandler]
 if customlogger:
     forward_lsst_log(t_level)
     handlers = [IPythonHandler()]
