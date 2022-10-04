@@ -25,17 +25,17 @@ except ImportError:
     pass  # Probably a container that doesn't have our new code
 
 # If the whole container is in debug mode, enable debug logging by default.
-# Otherwise, set warning as the default level; however, lsst logs should
-# be at info level. 
+# Otherwise, use the default level (which is warning); however, lsst logs
+# should be at info level. 
 debug = os.getenv("DEBUG")
 handlers = []
 if customlogger:
     # Forward anything at INFO or above, unless debug is set, in which case,
     # forward DEBUG and above.
-    if debug
-        forward_lsst_log(logging.DEBUG)
+    if debug:
+        forward_lsst_log('DEBUG')
     else:
-        forward_lsst_log(logging.INFO)
+        forward_lsst_log('INFO')
     handlers = [IPythonHandler()]
 else:
     # Set up WARNING and above as stderr, below that to stdout.  This is
