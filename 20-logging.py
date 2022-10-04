@@ -20,26 +20,34 @@ customlogger = False
 
 try:
     from lsst.rsp import IPythonHandler, forward_lsst_log
-
     customlogger = True
 except ImportError:
     pass  # Probably a container that doesn't have our new code
 
 # If the whole container is in debug mode, enable debug logging by default.
-#  Otherwise, set info as the default level.
-t_level = "INFO"
-level = logging.INFO
+# Otherwise, set warning as the default level; however, lsst logs should
+# be at info level. 
 debug = os.getenv("DEBUG")
-if debug:
-    t_level = "DEBUG"
-    level = logging.DEBUG
-# Set up WARNING and above as stderr, below that to stdout.
-warnhandler = logging.StreamHandler(stream=sys.stderr)
-warnhandler.setLevel(logging.WARNING)
-lowhandler = logging.StreamHandler(stream=sys.stdout)
-lowhandler.setLevel(level)
-handlers = [warnhandler, lowhandler]
+handlers = []
 if customlogger:
-    forward_lsst_log(t_level)
+    # Forward anything at INFO or above, unless debug is set, in which case,
+    # forward DEBUG and above.
+    if debug
+        forward_lsst_log(logging.DEBUG)
+    else:
+        forward_lsst_log(logging.INFO)
     handlers = [IPythonHandler()]
+else:
+    # Set up WARNING and above as stderr, below that to stdout.  This is
+    # intended to make GKE error reporting more consistent and to correspond
+    # to the usual Unix distinction between error and non-error output.
+    warnhandler = logging.StreamHandler(stream=sys.stderr)
+    warnhandler.setLevel(logging.WARNING)
+    handlers = [warnhandler]
+    if debug:
+        lowhandler = logging.StreamHandler(stream=sys.stdout)
+        lowhandler.setLevel(logging.DEBUG)
+        handlers.append(lowhandler)
 logging.basicConfig(force=True, handlers=handlers)
+# Now set up INFO for lsst logs everywhere
+logging.getLogger("lsst").setLevel(logging.INFO)
