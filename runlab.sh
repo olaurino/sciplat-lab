@@ -29,8 +29,25 @@ function copy_logging_profile() {
     profdir="${HOME}/.ipython/profile_default/startup"
     jldir="/opt/lsst/software/jupyterlab"
     mkdir -p ${profdir}
-    if [ ! -e "${profdir}/20-logging.py" ]; then
-	cp ${jldir}/20-logging.py ${profdir}
+    logfile="${profdir}/20-logging.py"
+    # If the logging directive file doesn't exist, or is unchanged from
+    # an earlier version, then replace it with the current one.  If it
+    # has changed, assume the user knew what they were doing and leave it
+    # untouched.
+    #
+    # previous_sums is a space-separated list of former checksums of the
+    # directive file in question.
+    previous_sums="2997fe99eb12846a1b724f0b82b9e5e6acbd1d4c29ceb9c9ae8f1ef5503892ec"
+    if [ ! -e "${logfile}" ]; then
+        cp ${jldir}/20-logging.py ${logfile}
+    else
+        for p in ${previous_sums}; do
+            s=$(sha256sum "${logfile}" | awk '{print $1}')
+            if [ "${s}" == "${p}" ]; then
+                cp ${jldir}/20-logging.py ${logfile}
+                break
+            fi
+        done
     fi
 }
 
@@ -41,13 +58,13 @@ function modify_settings_files() {
 
 function copy_dircolors() {
     if [ !  -e "${HOME}/.dir_colors" ]; then
-	cp /etc/dircolors.ansi-universal ${HOME}/.dir_colors
+        cp /etc/dircolors.ansi-universal ${HOME}/.dir_colors
     fi
 }
 
 function expand_panda_tilde() {
     if [ "${PANDA_CONFIG_ROOT}" = "~" ]; then
-	PANDA_CONFIG_ROOT="${HOME}"
+        PANDA_CONFIG_ROOT="${HOME}"
     fi
 }
 
@@ -89,14 +106,14 @@ function reset_user_env() {
     mkdir -p "${reloc}"
     local moved=""
     for i in local cache jupyter; do
-	if [ -d "${HOME}/.${i}" ]; then
-	    mv "${HOME}/.${i}" "${reloc}"
-	    moved="yes"
-	fi
+        if [ -d "${HOME}/.${i}" ]; then
+            mv "${HOME}/.${i}" "${reloc}"
+            moved="yes"
+        fi
     done
     # If nothing was actually relocated, then do not keep the reloc directory
     if [ -z "${moved}" ]; then
-	rmdir "${reloc}"
+        rmdir "${reloc}"
     fi
 }
 
@@ -157,9 +174,9 @@ fi
 # LOADRSPSTACK should be set, but if not...
 if [ -z "${LOADRSPSTACK}" ]; then
     if [ -e "/opt/lsst/software/rspstack/loadrspstack.bash" ]; then
-	LOADRSPSTACK="/opt/lsst/software/rspstack/loadrspstack.bash"
+        LOADRSPSTACK="/opt/lsst/software/rspstack/loadrspstack.bash"
     else
-	LOADRSPSTACK="/opt/lsst/software/stack/loadLSST.bash"
+        LOADRSPSTACK="/opt/lsst/software/stack/loadLSST.bash"
     fi
 fi
 export LOADRSPSTACK
