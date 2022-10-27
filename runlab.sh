@@ -5,6 +5,7 @@ function copy_butler_credentials() {
     # set the permissions accordingly, and repoint the environment variables.
     creddir="${HOME}/.lsst"
     mkdir -p "${creddir}"
+    chmod 0700 "${creddir}"
     if [ -n "${AWS_SHARED_CREDENTIALS_FILE}" ]; then
         awsname="$(basename ${AWS_SHARED_CREDENTIALS_FILE})"
         newcreds="${creddir}/${awsname}"
