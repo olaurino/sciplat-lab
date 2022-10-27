@@ -8,8 +8,8 @@ function copy_butler_credentials() {
     if [ -n "${AWS_SHARED_CREDENTIALS_FILE}" ]; then
         awsname="$(basename ${AWS_SHARED_CREDENTIALS_FILE})"
         newcreds="${creddir}/${awsname}"
-        chmod 0600 "${newcreds}"
         cp "${AWS_SHARED_CREDENTIALS_FILE}" "${newcreds}"
+        chmod 0600 "${newcreds}"
         ORIG_AWS_SHARED_CREDENTIALS_FILE="${AWS_SHARED_CREDENTIALS_FILE}"
         AWS_SHARED_CREDENTIALS_FILE="${newcreds}"
         export ORIG_AWS_SHARED_CREDENTIALS_FILE AWS_SHARED_CREDENTIALS_FILE
