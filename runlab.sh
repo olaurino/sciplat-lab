@@ -258,6 +258,7 @@ if [ -n "${EXTERNAL_FIREFLY_URL}" ]; then
 fi
 FIREFLY_HTML="slate.html"
 export FIREFLY_URL FIREFLY_HTML
+export JUPYTER_PREFER_ENV_PATH="no"
 if [ -z "${JUPYTERHUB_SERVICE_PREFIX}" ]; then
     # dask.distributed gets cranky if it's not there (since it is used
     #  in lsst_dask.yml); it will be for interactive use, and whether
