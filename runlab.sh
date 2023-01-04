@@ -246,13 +246,8 @@ if [ -n "${HUB_SERVICE_HOST}" ]; then
 fi
 export JUPYTERHUB_API_URL
 # Set Firefly URL and landing page
-if [ -z "${EXTERNAL_URL}" ]; then
-    EXTERNAL_URL=${EXTERNAL_INSTANCE_URL}
-    export EXTERNAL_URL
-fi
-host_url=$(echo ${EXTERNAL_URL} | cut -d '/' -f 1-3)
 FIREFLY_ROUTE=${FIREFLY_ROUTE:-"/firefly/"}
-FIREFLY_URL="${host_url}${FIREFLY_ROUTE}"
+FIREFLY_URL="${EXTERNAL_INSTANCE_URL}${FIREFLY_ROUTE}"
 if [ -n "${EXTERNAL_FIREFLY_URL}" ]; then
     FIREFLY_URL=${EXTERNAL_FIREFLY_URL}
 fi
