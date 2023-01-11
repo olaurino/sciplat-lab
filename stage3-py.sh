@@ -19,11 +19,11 @@ fi
 # moved ahead.
 rubin_env_ver=$(mamba list rubin-env$ --no-banner --json \
                     | jq -r '.[0].version')
-# Do the rest of the installation
-# Skip for now to get custom JL installed first
+# Do the rest of the installation; pin moto to overcome jsonschema version
+# breakage.
 mamba install --no-banner -y \
       "rubin-env-rsp==${rubin_env_ver}" \
-      "jsonschema>=4"
+      "moto<4"
 # Next, things on conda-forge not yet rolled into rubin-rsp-env
 mamba install --no-banner -y \
       jupyterlab-variableinspector
