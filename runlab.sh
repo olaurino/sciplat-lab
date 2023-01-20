@@ -231,9 +231,10 @@ cd ${HOME}
 #  populate it)
 copy_etc_skel
 # Replace API URL with service address if it exists
+jh_path="${JUPYTERHUB_BASE_URL}hub"
+ext_host=$(echo $EXTERNAL_INSTANCE_URL | cut -d '/' -f 3)
 if [ -n "${HUB_SERVICE_HOST}" ]; then
     jh_proto=$(echo $JUPYTERHUB_API_URL | cut -d '/' -f -1)
-    jh_path=$(echo $JUPYTERHUB_API_URL | cut -d '/' -f 4-)
     port=${HUB_SERVICE_PORT_API}
     if [ -z "${port}" ]; then
         port=${HUB_SERVICE_PORT}
@@ -259,7 +260,7 @@ if [ -z "${JUPYTERHUB_SERVICE_PREFIX}" ]; then
     #  in lsst_dask.yml); it will be for interactive use, and whether
     #  or not the proxy dashboard URL is correct doesn't matter in a
     #  noninteractive context.
-    JUPYTERHUB_SERVICE_PREFIX="/nb/user/${JUPYTERHUB_USER}"
+    JUPYTERHUB_SERVICE_PREFIX="${JUPYTERHUB_BASE_URL}user/${JUPYTERHUB_USER}"
     export JUPYTERHUB_SERVICE_PREFIX
 fi
 # Fetch/update magic notebook.  We want this in interactive, noninteractive,
@@ -289,8 +290,8 @@ cmd="python3 -s -m jupyter labhub \
      --port=8888 \
      --no-browser \
      --notebook-dir=${HOME} \
-     --hub-prefix=/nb/hub \
-     --hub-host=${EXTERNAL_INSTANCE_URL} \
+     --hub-prefix=${jh_path} \
+     --hub-host=${ext_host} \
      --log-level=WARN \
      --ContentsManager.allow_hidden=True \
      --FileContentsManager.hide_globs=[] \
