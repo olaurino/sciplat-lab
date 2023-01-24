@@ -39,8 +39,8 @@ pip install \
       jupyterlab_hdf \
       lsst-efd-client \
       jupyter_firefly_extensions \
-      lsst-rsp \
-      rsp-jupyter-extensions
+      git+https://github.com/lsst-sqre/lsst-rsp.git@tickets/DM-37661 \
+      git+https://github.com/lsst-sqre/rsp-jupyter-extensions.git@tickets/DM-37661
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
