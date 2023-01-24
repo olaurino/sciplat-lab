@@ -194,9 +194,7 @@ copy_logging_profile
 copy_dircolors
 # Retrieve image digest.  Nublado v3: it will be in JUPYTER_IMAGE_SPEC
 # already, because we pull with the digest
-echo ${JUPYTER_IMAGE_SPEC} | grep -q '@sha256:'
-rc=$?
-if [ ${rc} -eq 0 ]; then
+if echo "${JUPYTER_IMAGE_SPEC}" | grep -q '@sha256:'; then
     IMAGE_DIGEST=$(echo ${JUPYTER_IMAGE_SPEC} \
                    | cut -d '@' -f 2 \
                    | cut -d ':' -f 2)
