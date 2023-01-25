@@ -192,9 +192,15 @@ source /etc/profile.d/local05-path.sh
 copy_logging_profile
 # Make ls colorization better
 copy_dircolors
-# Retrieve image digest
-IMAGE_DIGEST=$(python -c 'import lsst.rsp;
-print(lsst.rsp.get_digest())')
+# Retrieve image digest.  Nublado v3: it will be in JUPYTER_IMAGE_SPEC
+# already, because we pull with the digest
+if echo "${JUPYTER_IMAGE_SPEC}" | grep -q '@sha256:'; then
+    IMAGE_DIGEST=$(echo ${JUPYTER_IMAGE_SPEC} \
+                   | cut -d '@' -f 2 \
+                   | cut -d ':' -f 2)
+else
+    IMAGE_DIGEST=$(python -c 'import lsst.rsp; print(lsst.rsp.get_digest())')
+fi
 export IMAGE_DIGEST
 # Set GitHub configuration
 if [ -n "${GITHUB_EMAIL}" ]; then
