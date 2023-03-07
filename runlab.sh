@@ -126,7 +126,7 @@ function set_cpu_variables() {
     fi
     # Force it to an integer
     declare -i cpu_limit
-    cpu_limit=${CPU_LIMIT}
+    cpu_limit=$( echo "${CPU_LIMIT}/1" | bc )
     # Force it to at least one
     if [ ${cpu_limit} -lt 1 ]; then
        ${cpu_limit} = 1
