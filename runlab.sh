@@ -118,6 +118,36 @@ function reset_user_env() {
     fi
 }
 
+function set_cpu_variables() {
+    # Make sure it has some value
+    if [ -z "${CPU_LIMIT}" ]; then
+	CPU_LIMIT=1.0
+	export CPU_LIMIT
+    fi
+    # Force it to an integer
+    declare -i cpu_limit
+    # We really don't have bc in the container
+    cpu_limit=$( echo "${CPU_LIMIT}" | cut -d . -f 1)
+    # Force it to at least one
+    if [ ${cpu_limit} -lt 1 ]; then
+       ${cpu_limit} = 1
+    fi
+    CPU_COUNT=${cpu_limit}
+    export CPU_COUNT
+    GOTO_NUM_THREADS=${cpu_limit}
+    MKL_DOMAIN_NUM_THREADS=${cpu_limit}
+    MKL_NUM_THREADS=${cpu_limit}
+    MPI_NUM_THREADS=${cpu_limit}
+    NUMEXPR_NUM_THREADS=${cpu_limit}
+    NUMEXPR_MAX_THREADS=${cpu_limit}
+    OMP_NUM_THREADS=${cpu_limit}
+    OPENBLAS_NUM_THREADS=${cpu_limit}
+    RAYON_NUM_THREADS=${cpu_limit}
+    export GOTO_NUM_THREADS MKL_DOMAIN_NUM_THREADS MKL_NUM_THREADS
+    export MPI_NUM_THREADS NUMEXPR_NUM_THREADS NUMEXPR_MAX_THREADS
+    export OMP_NUM_THREADS OPENBLAS_NUM_THREADS RAYON_NUM_THREADS
+}
+
 function copy_etc_skel() {
     es="/etc/skel"
     for i in $(find ${es}); do
@@ -188,6 +218,8 @@ source ${LOADRSPSTACK}
 unset SUDO_USER SUDO_UID SUDO_GID SUDO_COMMAND
 # Add paths
 source /etc/profile.d/local05-path.sh
+# Set custom CPU variables
+set_cpu_variables
 # Set up custom logger
 copy_logging_profile
 # Make ls colorization better
