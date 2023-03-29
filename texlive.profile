@@ -4,15 +4,15 @@
 #
 # Hand-edited since then by AJT
 #
-# Most recently 04 April 2022
+# Most recently 27 Mar 2023
 selected_scheme scheme-basic
-TEXDIR /usr/local/texlive/2022
-TEXMFCONFIG ~/.texlive2022/texmf-config
+TEXDIR /usr/local/texlive/2023
+TEXMFCONFIG ~/.texlive2023/texmf-config
 TEXMFHOME ~/texmf
 TEXMFLOCAL /usr/local/texlive/texmf-local
-TEXMFSYSCONFIG /usr/local/texlive/2022/texmf-config
-TEXMFSYSVAR /usr/local/texlive/2022/texmf-var
-TEXMFVAR ~/.texlive2022/texmf-var
+TEXMFSYSCONFIG /usr/local/texlive/2023/texmf-config
+TEXMFSYSVAR /usr/local/texlive/2023/texmf-var
+TEXMFVAR ~/.texlive2023/texmf-var
 binary_x86_64-linux 1
 instopt_adjustpath 0
 instopt_adjustrepo 1
