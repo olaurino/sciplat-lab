@@ -31,8 +31,8 @@ rm -f /etc/passwd  /etc/shadow  /etc/group  /etc/gshadow \
 
 # Check out notebooks-at-build-time
 # Do a shallow clone (important for the tutorials)
-branch="prod"
-notebooks="lsst-sqre/system-test rubin-dp0/tutorial-notebooks"
+branch="main"
+notebooks="juramaga/CSC2_tutorials"
 nbdir="/opt/lsst/software/notebooks-at-build-time"
 owd=$(pwd)
 source ${LOADRSPSTACK}

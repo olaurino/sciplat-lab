@@ -27,6 +27,8 @@ mamba install --no-banner -y \
 # Next, things on conda-forge not yet rolled into rubin-rsp-env
 mamba install --no-banner -y \
       jupyterlab-variableinspector
+
+mamba install -c https://cxc.cfa.harvard.edu/conda/ciao --no-banner -y ciao sherpa ciao-contrib
 # These are the things that are not available on conda-forge.
 # Note that we are not installing with `--upgrade`.  That is so that if
 # lower-level layers have already installed the package (e.g. T&S may have
@@ -40,7 +42,8 @@ pip install \
       lsst-efd-client \
       jupyter_firefly_extensions \
       lsst-rsp \
-      rsp-jupyter-extensions
+      rsp-jupyter-extensions \
+      bxa
 
 # Add stack kernel
 python3 -m ipykernel install --name 'LSST'
